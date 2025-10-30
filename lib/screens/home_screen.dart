@@ -45,8 +45,10 @@ class FoodInventoryNotifier extends ChangeNotifier {
 
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
-          .where((food) =>
-              food.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (food) =>
+                food.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
           .toList();
     }
 
@@ -143,9 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToEditFood(Food food) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddEditFoodScreen(food: food),
-      ),
+      MaterialPageRoute(builder: (context) => AddEditFoodScreen(food: food)),
     );
     if (result is Food) {
       _notifier.updateFood(result);
@@ -222,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _searchController.clear();
                             _notifier.setSearchQuery('');
                           },
-                        )
+                        ),
                     ],
                     onChanged: (value) {
                       _notifier.setSearchQuery(value);
@@ -251,7 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Chip(
                                   label: const Text('Expiring Soon'),
                                   backgroundColor: Colors.orange[100],
-                                  labelStyle: TextStyle(color: Colors.orange[900]),
+                                  labelStyle: TextStyle(
+                                    color: Colors.orange[900],
+                                  ),
                                   avatar: Icon(
                                     Icons.schedule,
                                     size: 18,
@@ -305,9 +307,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         _searchController.text.isNotEmpty
                             ? 'No foods match your search'
                             : 'No foods added yet',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -315,13 +317,10 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             else
               Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.8,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                   itemCount: foods.length,
                   itemBuilder: (context, index) {
@@ -345,7 +344,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   _notifier.deleteFood(food.id);
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Food deleted')),
+                                    const SnackBar(
+                                      content: Text('Food deleted'),
+                                    ),
                                   );
                                 },
                                 child: const Text('Delete'),
