@@ -1,0 +1,78 @@
+import 'package:hive/hive.dart';
+
+part 'food.g.dart';
+
+@HiveType(typeId: 0)
+class Food extends HiveObject {
+  @HiveField(0)
+  late String id;
+
+  @HiveField(1)
+  late String name;
+
+  @HiveField(2)
+  late String? barcode;
+
+  @HiveField(3)
+  late String? imageUrl;
+
+  @HiveField(4)
+  late int quantity;
+
+  @HiveField(5)
+  late String unit;
+
+  @HiveField(6)
+  late DateTime addedDate;
+
+  @HiveField(7)
+  late DateTime? expiryDate;
+
+  Food({
+    required this.id,
+    required this.name,
+    required this.quantity,
+     this.unit = 'g',
+    this.barcode,
+    this.imageUrl,
+    DateTime? addedDate,
+    this.expiryDate,
+  }) : addedDate = addedDate ?? DateTime.now();
+
+  bool get isExpired {
+    if (expiryDate == null) return false;
+    return DateTime.now().isAfter(expiryDate!);
+  }
+
+  bool get expiringSoon {
+    if (expiryDate == null) return false;
+    final daysUntilExpiry = expiryDate!.difference(DateTime.now()).inDays;
+    return daysUntilExpiry <= 3 && daysUntilExpiry > 0;
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'barcode': barcode,
+    'imageUrl': imageUrl,
+    'quantity': quantity,
+    'unit': unit,
+    'addedDate': addedDate.toIso8601String(),
+    'expiryDate': expiryDate?.toIso8601String(),
+  };
+
+  factory Food.fromJson(Map<String, dynamic> json) => Food(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    barcode: json['barcode'] as String?,
+    imageUrl: json['imageUrl'] as String?,
+    quantity: json['quantity'] as int? ?? 1,
+    unit: json['unit'] as String? ?? 'g',
+    addedDate: json['addedDate'] != null
+        ? DateTime.parse(json['addedDate'] as String)
+        : DateTime.now(),
+    expiryDate: json['expiryDate'] != null
+        ? DateTime.parse(json['expiryDate'] as String)
+        : null,
+  );
+}
