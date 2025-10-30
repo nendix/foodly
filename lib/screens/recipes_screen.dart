@@ -5,8 +5,6 @@ import '../services/spoonacular_service.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
 
-enum RecipeFilter { all, quick, balanced, impressive }
-
 class RecipesScreen extends StatefulWidget {
   final List<Food> foods;
 
@@ -22,13 +20,19 @@ class _RecipesScreenState extends State<RecipesScreen> {
   List<Recipe>? _filteredRecipes;
   bool _isLoading = false;
   String _searchQuery = '';
-  RecipeFilter _selectedFilter = RecipeFilter.all;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _recipeService = SpoonacularService();
     _loadRecipes();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadRecipes() async {
@@ -39,9 +43,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
       final ingredients = widget.foods.map((f) => f.name).toList();
       final recipes = await _recipeService.findByIngredients(ingredients);
       if (mounted) {
+        recipes.sort((a, b) => b.usedIngredientCount.compareTo(a.usedIngredientCount));
         setState(() {
           _recipes = recipes;
-          _applyFilters();
+          _applySearch();
         });
       }
     } catch (e) {
@@ -55,7 +60,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
     }
   }
 
-  void _applyFilters() {
+  void _applySearch() {
     if (_recipes == null) return;
 
     List<Recipe> filtered = _recipes!;
@@ -67,41 +72,12 @@ class _RecipesScreenState extends State<RecipesScreen> {
           .toList();
     }
 
-    switch (_selectedFilter) {
-      case RecipeFilter.quick:
-        filtered = filtered
-            .where((recipe) => recipe.usedIngredientCount > 2)
-            .toList();
-        break;
-      case RecipeFilter.balanced:
-        filtered = filtered
-            .where((recipe) =>
-                recipe.usedIngredientCount > 1 &&
-                recipe.missedIngredientCount <= 3)
-            .toList();
-        break;
-      case RecipeFilter.impressive:
-        filtered = filtered
-            .where((recipe) =>
-                recipe.usedIngredientCount >= 3 ||
-                recipe.missedIngredientCount > 4)
-            .toList();
-        break;
-      case RecipeFilter.all:
-        break;
-    }
-
     setState(() => _filteredRecipes = filtered);
   }
 
   void _updateSearch(String query) {
     _searchQuery = query;
-    _applyFilters();
-  }
-
-  void _updateFilter(RecipeFilter filter) {
-    _selectedFilter = filter;
-    _applyFilters();
+    _applySearch();
   }
 
   @override
@@ -163,43 +139,21 @@ class _RecipesScreenState extends State<RecipesScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            spacing: 12,
-            children: [
-              SearchBar(
-                hintText: 'Search recipes...',
-                leading: const Icon(Icons.search),
-                onChanged: _updateSearch,
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    FilterChip(
-                      label: const Text('All'),
-                      selected: _selectedFilter == RecipeFilter.all,
-                      onSelected: (_) => _updateFilter(RecipeFilter.all),
-                    ),
-                    FilterChip(
-                      label: const Text('Quick'),
-                      selected: _selectedFilter == RecipeFilter.quick,
-                      onSelected: (_) => _updateFilter(RecipeFilter.quick),
-                    ),
-                    FilterChip(
-                      label: const Text('Balanced'),
-                      selected: _selectedFilter == RecipeFilter.balanced,
-                      onSelected: (_) => _updateFilter(RecipeFilter.balanced),
-                    ),
-                    FilterChip(
-                      label: const Text('Impressive'),
-                      selected: _selectedFilter == RecipeFilter.impressive,
-                      onSelected: (_) => _updateFilter(RecipeFilter.impressive),
-                    ),
-                  ],
+          child: SearchBar(
+            controller: _searchController,
+            hintText: 'Search recipes...',
+            leading: const Icon(Icons.search),
+            trailing: [
+              if (_searchController.text.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _updateSearch('');
+                  },
                 ),
-              ),
             ],
+            onChanged: _updateSearch,
           ),
         ),
         if (_filteredRecipes == null || _filteredRecipes!.isEmpty)
@@ -209,13 +163,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.filter_list_off,
+                    Icons.search_off,
                     size: 64,
                     color: Colors.grey[400],
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No recipes match your filters',
+                    'No recipes match your search',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.grey,
                     ),
