@@ -39,15 +39,25 @@ class Food extends HiveObject {
     this.expiryDate,
   }) : addedDate = addedDate ?? DateTime.now();
 
+
+  int? get daysUntilExpiry {
+    if (expiryDate == null) return null;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final expiryDay = DateTime(expiryDate!.year, expiryDate!.month, expiryDate!.day);
+    return expiryDay.difference(today).inDays;
+  }
+
   bool get isExpired {
     if (expiryDate == null) return false;
-    return DateTime.now().isAfter(expiryDate!);
+    final daysLeft = daysUntilExpiry;
+    return daysLeft != null && daysLeft < 0;
   }
 
   bool get expiringSoon {
     if (expiryDate == null) return false;
-    final daysUntilExpiry = expiryDate!.difference(DateTime.now()).inDays;
-    return daysUntilExpiry <= 3 && daysUntilExpiry > 0;
+    final daysLeft = daysUntilExpiry;
+    return daysLeft != null && daysLeft <= 3 && daysLeft > 0;
   }
 
   Map<String, dynamic> toJson() => {
