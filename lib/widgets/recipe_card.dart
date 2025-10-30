@@ -51,7 +51,7 @@ class RecipeCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Ingredients: ${recipe.possessedCount} out of ${recipe.possessedCount + recipe.missingCount} ',
+                        'ingredients: ${recipe.possessedCount} out of ${recipe.possessedCount + recipe.missingCount} ',
                         style: TextStyle(fontSize: 13),
                       ),
                     ],
