@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../services/open_food_facts_service.dart';
-import '../services/barcode_cache_service.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
 import 'barcode_scanner_screen.dart';
@@ -25,21 +24,15 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
   String _selectedUnit = 'g';
   bool _isLoading = false;
   final OpenFoodFactsService _apiService = OpenFoodFactsService();
-  final BarcodeCacheService _cacheService = BarcodeCacheService();
 
   @override
   void initState() {
     super.initState();
-    _initCache();
     _nameController = TextEditingController(text: widget.food?.name ?? '');
     _quantityController = TextEditingController(text: widget.food?.quantity.toString() ?? '1');
     _barcodeController = TextEditingController(text: widget.food?.barcode ?? '');
     _expiryDate = widget.food?.expiryDate;
     _selectedUnit = widget.food?.unit ?? 'g';
-  }
-
-  Future<void> _initCache() async {
-    await _cacheService.init();
   }
 
   @override
@@ -64,23 +57,14 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
   Future<void> _fetchProductFromBarcode(String barcode) async {
     setState(() => _isLoading = true);
     try {
-      final cached = _cacheService.getBarcode(barcode);
-      if (cached != null && mounted) {
+      final product = await _apiService.searchByBarcode(barcode);
+      if (product != null && mounted) {
         setState(() {
-          _nameController.text = cached.productName;
+          _nameController.text = product.name;
         });
-        showSuccessSnackbar(context, 'Product found (cached)!');
-      } else {
-        final product = await _apiService.searchByBarcode(barcode);
-        if (product != null && mounted) {
-          setState(() {
-            _nameController.text = product.name;
-          });
-          _cacheService.cacheBarcode(barcode, product.name, brand: product.brand);
-          showSuccessSnackbar(context, 'Product found!');
-        } else if (mounted) {
-          showErrorDialog(context, Exception('Product not found'));
-        }
+        showSuccessSnackbar(context, 'Product found!');
+      } else if (mounted) {
+        showErrorDialog(context, Exception('Product not found'));
       }
     } catch (e) {
       if (mounted) {
