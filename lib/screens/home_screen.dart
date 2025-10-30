@@ -328,11 +328,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     final food = foods[index];
                     return FoodCard(
                       food: food,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${food.name} - ${food.quantity} ${food.unit}')),
-                        );
-                      },
                       onEdit: () => _navigateToEditFood(food),
                       onDelete: () {
                         showDialog(
