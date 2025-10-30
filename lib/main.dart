@@ -22,7 +22,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Foodly',
+      title: 'foodly',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.getTheme(),
       themeMode: ThemeMode.dark,

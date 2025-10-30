@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
       value: _notifier,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Foodly'),
+          title: const Text('foodly'),
           centerTitle: true,
           elevation: 0,
         ),
@@ -204,10 +204,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         _searchController.text.isNotEmpty
                             ? 'No foods match your search'
                             : 'No foods added yet',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(color: Colors.grey),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -227,30 +226,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       food: food,
                       onEdit: () => _navigateToEditFood(food),
                       onDelete: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Delete Food'),
-                            content: Text('Remove ${food.name}?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  _notifier.deleteFood(food.id);
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Food deleted'),
-                                    ),
-                                  );
-                                },
-                                child: const Text('Delete'),
-                              ),
-                            ],
-                          ),
+                        _notifier.deleteFood(food.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Food deleted')),
                         );
                       },
                     );
