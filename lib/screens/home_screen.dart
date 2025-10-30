@@ -1,0 +1,245 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/food.dart';
+import '../services/storage_service.dart';
+import '../widgets/food_card.dart';
+import 'add_edit_food_screen.dart';
+import 'recipes_screen.dart';
+
+class FoodInventoryNotifier extends ChangeNotifier {
+  final StorageService _storageService = StorageService();
+  List<Food> _foods = [];
+
+  List<Food> get foods {
+    return _foods;
+  }
+
+  FoodInventoryNotifier() {
+    _loadFoods();
+  }
+
+  void _loadFoods() {
+    _foods = _storageService.getAllFoods();
+    notifyListeners();
+  }
+
+  void addFood(Food food) {
+    _storageService.addFood(food);
+    _loadFoods();
+  }
+
+  void updateFood(Food food) {
+    _storageService.updateFood(food);
+    _loadFoods();
+  }
+
+  void deleteFood(String id) {
+    _storageService.deleteFood(id);
+    _loadFoods();
+  }
+
+  List<Food> searchFoods(String query) {
+    return _storageService.searchFoods(query);
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late FoodInventoryNotifier _notifier;
+  final TextEditingController _searchController = TextEditingController();
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _notifier = FoodInventoryNotifier();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _notifier.dispose();
+    super.dispose();
+  }
+
+  void _navigateToAddFood() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddEditFoodScreen()),
+    );
+    if (result is Food) {
+      _notifier.addFood(result);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Food added successfully')),
+        );
+      }
+    }
+  }
+
+  void _navigateToEditFood(Food food) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddEditFoodScreen(food: food),
+      ),
+    );
+    if (result is Food) {
+      _notifier.updateFood(result);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Food updated successfully')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider.value(
+      value: _notifier,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Foodly'),
+          centerTitle: true,
+          elevation: 0,
+        ),
+        body: _selectedIndex == 0 ? _buildInventoryView() : _buildRecipesView(),
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          selectedIndex: _selectedIndex,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.inventory_2),
+              label: 'Inventory',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.restaurant),
+              label: 'Recipes',
+            ),
+          ],
+        ),
+        floatingActionButton: _selectedIndex == 0
+            ? FloatingActionButton(
+                onPressed: _navigateToAddFood,
+                child: const Icon(Icons.add),
+              )
+            : null,
+      ),
+    );
+  }
+
+  Widget _buildInventoryView() {
+    return Consumer<FoodInventoryNotifier>(
+      builder: (context, notifier, _) {
+        final foods = notifier.foods;
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SearchBar(
+                controller: _searchController,
+                hintText: 'Search foods...',
+                leading: const Icon(Icons.search),
+                onChanged: (value) {
+                  setState(() {});
+                },
+              ),
+            ),
+            if (foods.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.inbox_outlined,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No foods added yet',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: foods.length,
+                  itemBuilder: (context, index) {
+                    final food = foods[index];
+                    return FoodCard(
+                      food: food,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${food.name} - ${food.quantity} ${food.unit}')),
+                        );
+                      },
+                      onEdit: () => _navigateToEditFood(food),
+                      onDelete: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Food'),
+                            content: Text('Remove ${food.name}?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  _notifier.deleteFood(food.id);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Food deleted')),
+                                  );
+                                },
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRecipesView() {
+    return Consumer<FoodInventoryNotifier>(
+      builder: (context, notifier, _) {
+        return RecipesScreen(foods: notifier.foods);
+      },
+    );
+  }
+}
