@@ -43,7 +43,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
       final ingredients = widget.foods.map((f) => f.name).toList();
       final recipes = await _recipeService.findByIngredients(ingredients);
       if (mounted) {
-        recipes.sort((a, b) => b.usedIngredientCount.compareTo(a.usedIngredientCount));
+        recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
         setState(() {
           _recipes = recipes;
           _applySearch();
@@ -194,10 +194,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
   }
 
   Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
-    final usedPercentage =
-        (recipe.usedIngredientCount / (recipe.usedIngredientCount + recipe.missedIngredientCount) * 100)
-            .toStringAsFixed(0);
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
@@ -208,47 +204,24 @@ class _RecipesScreenState extends State<RecipesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  child: Image.network(
-                    recipe.image,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image_not_supported),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '$usedPercentage% match',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+              child: Image.network(
+                recipe.image,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 180,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.image_not_supported),
+                  );
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -261,66 +234,32 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.green[50],
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.green[300]!),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                '${recipe.usedIngredientCount}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green[700],
-                                ),
-                              ),
-                              Text(
-                                'Have',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.green[700],
-                                ),
-                              ),
-                            ],
-                          ),
+                      Icon(Icons.check_circle, size: 16, color: Colors.green[700]),
+                      const SizedBox(width: 6),
+                       Text(
+                         '${recipe.possessedCount}',
+                         style: TextStyle(
+                           fontWeight: FontWeight.bold,
+                           color: Colors.green[700],
+                           fontSize: 13,
+                         ),
+                       ),
+                       const Text(' have', style: TextStyle(fontSize: 13)),
+                       const SizedBox(width: 16),
+                       Icon(Icons.cancel, size: 16, color: Colors.orange[700]),
+                       const SizedBox(width: 6),
+                       Text(
+                         '${recipe.missingCount}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange[700],
+                          fontSize: 13,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.orange[50],
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.orange[300]!),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                '${recipe.missedIngredientCount}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange[700],
-                                ),
-                              ),
-                              Text(
-                                'Missing',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.orange[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      const Text(' missing', style: TextStyle(fontSize: 13)),
                     ],
                   ),
                 ],
@@ -385,20 +324,20 @@ class _RecipesScreenState extends State<RecipesScreen> {
                   children: [
                     _buildStatItem(
                       context,
-                      '${recipe.usedIngredientCount}',
+                      '${recipe.possessedCount}',
                       'Have',
                       Colors.green,
                     ),
                     _buildStatItem(
                       context,
-                      '${recipe.missedIngredientCount}',
+                      '${recipe.missingCount}',
                       'Missing',
                       Colors.orange,
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                if (recipe.usedIngredients.isNotEmpty)
+                if (recipe.possessedIngredients.isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -407,15 +346,15 @@ class _RecipesScreenState extends State<RecipesScreen> {
                           Icon(Icons.check_circle, color: Colors.green[700], size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Used Ingredients (${recipe.usedIngredients.length})',
+                            'Possessed Ingredients (${recipe.possessedIngredients.length})',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      ...recipe.usedIngredients.map(
+                       ),
+                       const SizedBox(height: 12),
+                       ...recipe.possessedIngredients.map(
                         (ing) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
@@ -442,7 +381,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                       const SizedBox(height: 24),
                     ],
                   ),
-                if (recipe.missedIngredients.isNotEmpty)
+                if (recipe.missingIngredients.isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -451,15 +390,15 @@ class _RecipesScreenState extends State<RecipesScreen> {
                           Icon(Icons.cancel, color: Colors.orange[700], size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Missing Ingredients (${recipe.missedIngredients.length})',
+                            'Missing Ingredients (${recipe.missingIngredients.length})',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      ...recipe.missedIngredients.map(
+                       ),
+                       const SizedBox(height: 12),
+                       ...recipe.missingIngredients.map(
                         (ing) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
