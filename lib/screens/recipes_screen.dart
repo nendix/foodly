@@ -5,6 +5,8 @@ import '../services/spoonacular_service.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
 
+enum RecipeFilter { all, quick, balanced, impressive }
+
 class RecipesScreen extends StatefulWidget {
   final List<Food> foods;
 
@@ -17,7 +19,10 @@ class RecipesScreen extends StatefulWidget {
 class _RecipesScreenState extends State<RecipesScreen> {
   late SpoonacularService _recipeService;
   List<Recipe>? _recipes;
+  List<Recipe>? _filteredRecipes;
   bool _isLoading = false;
+  String _searchQuery = '';
+  RecipeFilter _selectedFilter = RecipeFilter.all;
 
   @override
   void initState() {
@@ -34,7 +39,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
       final ingredients = widget.foods.map((f) => f.name).toList();
       final recipes = await _recipeService.findByIngredients(ingredients);
       if (mounted) {
-        setState(() => _recipes = recipes);
+        setState(() {
+          _recipes = recipes;
+          _applyFilters();
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -45,6 +53,55 @@ class _RecipesScreenState extends State<RecipesScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _applyFilters() {
+    if (_recipes == null) return;
+
+    List<Recipe> filtered = _recipes!;
+
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered
+          .where((recipe) =>
+              recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    switch (_selectedFilter) {
+      case RecipeFilter.quick:
+        filtered = filtered
+            .where((recipe) => recipe.usedIngredientCount > 2)
+            .toList();
+        break;
+      case RecipeFilter.balanced:
+        filtered = filtered
+            .where((recipe) =>
+                recipe.usedIngredientCount > 1 &&
+                recipe.missedIngredientCount <= 3)
+            .toList();
+        break;
+      case RecipeFilter.impressive:
+        filtered = filtered
+            .where((recipe) =>
+                recipe.usedIngredientCount >= 3 ||
+                recipe.missedIngredientCount > 4)
+            .toList();
+        break;
+      case RecipeFilter.all:
+        break;
+    }
+
+    setState(() => _filteredRecipes = filtered);
+  }
+
+  void _updateSearch(String query) {
+    _searchQuery = query;
+    _applyFilters();
+  }
+
+  void _updateFilter(RecipeFilter filter) {
+    _selectedFilter = filter;
+    _applyFilters();
   }
 
   @override
@@ -102,20 +159,102 @@ class _RecipesScreenState extends State<RecipesScreen> {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _recipes!.length,
-      itemBuilder: (context, index) {
-        final recipe = _recipes![index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () {
-              showRecipeDetails(context, recipe);
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            spacing: 12,
+            children: [
+              SearchBar(
+                hintText: 'Search recipes...',
+                leading: const Icon(Icons.search),
+                onChanged: _updateSearch,
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    FilterChip(
+                      label: const Text('All'),
+                      selected: _selectedFilter == RecipeFilter.all,
+                      onSelected: (_) => _updateFilter(RecipeFilter.all),
+                    ),
+                    FilterChip(
+                      label: const Text('Quick'),
+                      selected: _selectedFilter == RecipeFilter.quick,
+                      onSelected: (_) => _updateFilter(RecipeFilter.quick),
+                    ),
+                    FilterChip(
+                      label: const Text('Balanced'),
+                      selected: _selectedFilter == RecipeFilter.balanced,
+                      onSelected: (_) => _updateFilter(RecipeFilter.balanced),
+                    ),
+                    FilterChip(
+                      label: const Text('Impressive'),
+                      selected: _selectedFilter == RecipeFilter.impressive,
+                      onSelected: (_) => _updateFilter(RecipeFilter.impressive),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_filteredRecipes == null || _filteredRecipes!.isEmpty)
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.filter_list_off,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No recipes match your filters',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _filteredRecipes!.length,
+              itemBuilder: (context, index) {
+                final recipe = _filteredRecipes![index];
+                return _buildRecipeCard(context, recipe);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
+    final usedPercentage =
+        (recipe.usedIngredientCount / (recipe.usedIngredientCount + recipe.missedIngredientCount) * 100)
+            .toStringAsFixed(0);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          showRecipeDetails(context, recipe);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
@@ -136,123 +275,295 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        recipe.title,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '$usedPercentage% match',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.green[100],
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${recipe.usedIngredientCount} used',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: Colors.green[800],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange[100],
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${recipe.missedIngredientCount} missing',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: Colors.orange[800],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        );
-      },
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    recipe.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.green[50],
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.green[300]!),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '${recipe.usedIngredientCount}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green[700],
+                                ),
+                              ),
+                              Text(
+                                'Have',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.green[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.orange[50],
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.orange[300]!),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '${recipe.missedIngredientCount}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange[700],
+                                ),
+                              ),
+                              Text(
+                                'Missing',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.orange[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   void showRecipeDetails(BuildContext context, Recipe recipe) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              recipe.title,
-              style: Theme.of(context).textTheme.titleLarge,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    height: 4,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  recipe.title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    recipe.image,
+                    height: 250,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 250,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image_not_supported),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatItem(
+                      context,
+                      '${recipe.usedIngredientCount}',
+                      'Have',
+                      Colors.green,
+                    ),
+                    _buildStatItem(
+                      context,
+                      '${recipe.missedIngredientCount}',
+                      'Missing',
+                      Colors.orange,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                if (recipe.usedIngredients.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.green[700], size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Used Ingredients (${recipe.usedIngredients.length})',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ...recipe.usedIngredients.map(
+                        (ing) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: Colors.green[700],
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  ing,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                if (recipe.missedIngredients.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.cancel, color: Colors.orange[700], size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Missing Ingredients (${recipe.missedIngredients.length})',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ...recipe.missedIngredients.map(
+                        (ing) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: Colors.orange[700],
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  ing,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 16),
-            if (recipe.usedIngredients.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Used Ingredients:',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  ...recipe.usedIngredients.map(
-                    (ing) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.check_circle, color: Colors.green, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(ing)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            if (recipe.missedIngredients.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Missing Ingredients:',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  ...recipe.missedIngredients.map(
-                    (ing) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.cancel, color: Colors.orange, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(ing)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, String value, String label, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelMedium,
+        ),
+      ],
     );
   }
 }
