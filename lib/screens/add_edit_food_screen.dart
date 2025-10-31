@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../services/open_food_facts_service.dart';
-import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
 import '../utils/connectivity_helper.dart';
+import '../utils/snackbar_helper.dart';
 import 'scanner_screen.dart';
 
 class AddEditFoodScreen extends StatefulWidget {
@@ -44,71 +44,75 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
     super.dispose();
   }
 
-  Future<void> _scanBarcode() async {
-    if (!await hasInternetConnection()) {
-      if (mounted) {
-        showNoConnectionSnackbar(context);
-      }
-      return;
-    }
-    
-    final barcode = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ScannerScreen()),
-    );
-    if (barcode != null) {
-      _barcodeController.text = barcode;
-      _fetchProductFromBarcode(barcode);
-    }
-  }
+   Future<void> _scanBarcode() async {
+     if (!await hasInternetConnection()) {
+       if (mounted) {
+         showErrorSnackbar(context, 'No internet connection. Please check your connection and try again.');
+       }
+       return;
+     }
+     
+     if (!mounted) return;
+     
+     final barcode = await Navigator.push<String>(
+       context,
+       MaterialPageRoute(builder: (context) => const ScannerScreen()),
+     );
+     
+     if (!mounted) return;
+     
+     if (barcode != null) {
+       _barcodeController.text = barcode;
+       _fetchProductFromBarcode(barcode);
+     }
+   }
 
-  Future<void> _fetchProductFromBarcode(String barcode) async {
-    setState(() => _isLoading = true);
-    try {
-      final product = await _apiService.searchByBarcode(barcode);
-      if (product != null && mounted) {
-        setState(() {
-          _nameController.text = product.name;
-        });
-        showSuccessSnackbar(context, 'Product found!');
-      } else if (mounted) {
-        showErrorDialog(context, Exception('Product not found'));
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorDialog(context, e);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
+   Future<void> _fetchProductFromBarcode(String barcode) async {
+     setState(() => _isLoading = true);
+     try {
+       final product = await _apiService.searchByBarcode(barcode);
+       if (product != null && mounted) {
+         setState(() {
+           _nameController.text = product.name;
+         });
+       } else if (mounted) {
+         showErrorSnackbar(context, 'Product not found');
+       }
+     } catch (e) {
+       if (mounted) {
+         showErrorSnackbar(context, e.toString());
+       }
+     } finally {
+       if (mounted) {
+         setState(() => _isLoading = false);
+       }
+     }
+   }
 
-  Future<void> _searchByName() async {
-    if (_nameController.text.isEmpty) {
-      showErrorDialog(context, Exception('Enter a product name'));
-      return;
-    }
+   Future<void> _searchByName() async {
+     if (_nameController.text.isEmpty) {
+       showErrorSnackbar(context, 'Enter a product name');
+       return;
+     }
 
-    setState(() => _isLoading = true);
-    try {
-      final products = await _apiService.searchByName(_nameController.text);
-      if (mounted && products.isNotEmpty) {
-        _showProductSelection(products);
-      } else if (mounted) {
-        showErrorDialog(context, Exception('No products found'));
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorDialog(context, e);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
+     setState(() => _isLoading = true);
+     try {
+       final products = await _apiService.searchByName(_nameController.text);
+       if (mounted && products.isNotEmpty) {
+         _showProductSelection(products);
+       } else if (mounted) {
+         showErrorSnackbar(context, 'No products found');
+       }
+     } catch (e) {
+       if (mounted) {
+         showErrorSnackbar(context, e.toString());
+       }
+     } finally {
+       if (mounted) {
+         setState(() => _isLoading = false);
+       }
+     }
+   }
 
   void _showProductSelection(products) {
     showModalBottomSheet(
@@ -146,29 +150,29 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
     }
   }
 
-  void _saveFoodItem() {
-    if (_nameController.text.isEmpty) {
-      showErrorDialog(context, Exception('Food name is required'));
-      return;
-    }
+   void _saveFoodItem() {
+     if (_nameController.text.isEmpty) {
+       showErrorSnackbar(context, 'Food name is required');
+       return;
+     }
 
-    if (int.tryParse(_quantityController.text) == null || int.parse(_quantityController.text) <= 0) {
-      showErrorDialog(context, Exception('Quantity must be a positive number'));
-      return;
-    }
+     if (int.tryParse(_quantityController.text) == null || int.parse(_quantityController.text) <= 0) {
+       showErrorSnackbar(context, 'Quantity must be a positive number');
+       return;
+     }
 
-    final food = Food(
-      id: widget.food?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      name: _nameController.text.trim(),
-      quantity: int.parse(_quantityController.text),
-      unit: _selectedUnit,
-      barcode: _barcodeController.text.isEmpty ? null : _barcodeController.text,
-      expiryDate: _expiryDate,
-      addedDate: widget.food?.addedDate ?? DateTime.now(),
-    );
+     final food = Food(
+       id: widget.food?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+       name: _nameController.text.trim(),
+       quantity: int.parse(_quantityController.text),
+       unit: _selectedUnit,
+       barcode: _barcodeController.text.isEmpty ? null : _barcodeController.text,
+       expiryDate: _expiryDate,
+       addedDate: widget.food?.addedDate ?? DateTime.now(),
+     );
 
-    Navigator.pop(context, food);
-  }
+     Navigator.pop(context, food);
+   }
 
   @override
   Widget build(BuildContext context) {

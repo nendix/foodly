@@ -91,35 +91,25 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _navigateToAddFood() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddEditFoodScreen()),
-    );
-    if (result is Food) {
-      _notifier.addFood(result);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Food added successfully')),
-        );
-      }
-    }
-  }
+   void _navigateToAddFood() async {
+     final result = await Navigator.push(
+       context,
+       MaterialPageRoute(builder: (context) => const AddEditFoodScreen()),
+     );
+     if (result is Food) {
+       _notifier.addFood(result);
+     }
+   }
 
-  void _navigateToEditFood(Food food) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddEditFoodScreen(food: food)),
-    );
-    if (result is Food) {
-      _notifier.updateFood(result);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Food updated successfully')),
-        );
-      }
-    }
-  }
+   void _navigateToEditFood(Food food) async {
+     final result = await Navigator.push(
+       context,
+       MaterialPageRoute(builder: (context) => AddEditFoodScreen(food: food)),
+     );
+     if (result is Food) {
+       _notifier.updateFood(result);
+     }
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -228,9 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       onEdit: () => _navigateToEditFood(food),
                       onDelete: () {
                         _notifier.deleteFood(food.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Food deleted')),
-                        );
                       },
                     );
                   },

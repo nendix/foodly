@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../models/recipe.dart';
 import '../services/spoonacular_service.dart';
-import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
 import '../utils/connectivity_helper.dart';
+import '../utils/snackbar_helper.dart';
 
 class RecipesScreen extends StatefulWidget {
   final List<Food> foods;
@@ -37,37 +37,37 @@ class _RecipesScreenState extends State<RecipesScreen> {
     super.dispose();
   }
 
-  Future<void> _loadRecipes() async {
-    if (widget.foods.isEmpty) return;
+   Future<void> _loadRecipes() async {
+     if (widget.foods.isEmpty) return;
 
-    if (!await hasInternetConnection()) {
-      if (mounted) {
-        showNoConnectionSnackbar(context);
-      }
-      return;
-    }
+     if (!await hasInternetConnection()) {
+       if (mounted) {
+         showErrorSnackbar(context, 'No internet connection. Please check your connection and try again.');
+       }
+       return;
+     }
 
-    setState(() => _isLoading = true);
-    try {
-      final ingredients = widget.foods.map((f) => f.name).toList();
-      final recipes = await _recipeService.findByIngredients(ingredients);
-      if (mounted) {
-        recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
-        setState(() {
-          _recipes = recipes;
-          _applySearch();
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorDialog(context, e);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
+     setState(() => _isLoading = true);
+     try {
+       final ingredients = widget.foods.map((f) => f.name).toList();
+       final recipes = await _recipeService.findByIngredients(ingredients);
+       if (mounted) {
+         recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
+         setState(() {
+           _recipes = recipes;
+           _applySearch();
+         });
+       }
+     } catch (e) {
+       if (mounted) {
+         showErrorSnackbar(context, e.toString());
+       }
+     } finally {
+       if (mounted) {
+         setState(() => _isLoading = false);
+       }
+     }
+   }
 
   void _applySearch() {
     if (_recipes == null) return;
