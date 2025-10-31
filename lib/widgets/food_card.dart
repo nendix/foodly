@@ -28,7 +28,6 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
   String? _dragDirection;
   late double _cardWidth;
 
-  static const double _edgeZoneRatio = 0.2;
   static const double _thresholdRatio = 0.33;
 
   @override
@@ -73,16 +72,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
   }
 
   void _onHorizontalDragStart(DragStartDetails details) {
-    final edgeZone = _cardWidth * _edgeZoneRatio;
-    final dx = details.localPosition.dx;
-
-    if (dx < edgeZone) {
-      _dragDirection = 'left';
-      _isDragging = true;
-    } else if (dx > _cardWidth - edgeZone) {
-      _dragDirection = 'right';
-      _isDragging = true;
-    }
+    _isDragging = true;
   }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
@@ -90,6 +80,11 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
 
     setState(() {
       _dragOffset = Offset(_dragOffset.dx + details.delta.dx, 0);
+      if (_dragOffset.dx > 0) {
+        _dragDirection = 'left';
+      } else if (_dragOffset.dx < 0) {
+        _dragDirection = 'right';
+      }
     });
   }
 
@@ -167,11 +162,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                         child: Container(
                           alignment: Alignment.centerLeft,
                           padding: const EdgeInsets.only(left: 16),
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.blue[700],
-                            size: 24,
-                          ),
+                          child: Icon(Icons.edit, color: Colors.grey, size: 24),
                         ),
                       ),
                     ),
@@ -185,7 +176,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                           padding: const EdgeInsets.only(right: 16),
                           child: Icon(
                             Icons.delete,
-                            color: Colors.red[700],
+                            color: Colors.grey,
                             size: 24,
                           ),
                         ),
