@@ -4,6 +4,7 @@ import '../models/food.dart';
 import '../services/open_food_facts_service.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
+import '../utils/connectivity_helper.dart';
 import 'scanner_screen.dart';
 
 class AddEditFoodScreen extends StatefulWidget {
@@ -44,6 +45,13 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
   }
 
   Future<void> _scanBarcode() async {
+    if (!await hasInternetConnection()) {
+      if (mounted) {
+        showNoConnectionSnackbar(context);
+      }
+      return;
+    }
+    
     final barcode = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ScannerScreen()),
