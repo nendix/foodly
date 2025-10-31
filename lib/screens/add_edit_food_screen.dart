@@ -4,7 +4,7 @@ import '../models/food.dart';
 import '../services/open_food_facts_service.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
-import 'barcode_scanner_screen.dart';
+import 'scanner_screen.dart';
 
 class AddEditFoodScreen extends StatefulWidget {
   final Food? food;
@@ -46,7 +46,7 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
   Future<void> _scanBarcode() async {
     final barcode = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
+      MaterialPageRoute(builder: (context) => const ScannerScreen()),
     );
     if (barcode != null) {
       _barcodeController.text = barcode;
