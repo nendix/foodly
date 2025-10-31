@@ -5,6 +5,7 @@ import '../services/spoonacular_service.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
+import '../utils/connectivity_helper.dart';
 
 class RecipesScreen extends StatefulWidget {
   final List<Food> foods;
@@ -38,6 +39,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
   Future<void> _loadRecipes() async {
     if (widget.foods.isEmpty) return;
+
+    if (!await hasInternetConnection()) {
+      if (mounted) {
+        showNoConnectionSnackbar(context);
+      }
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
