@@ -223,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final food = foods[index];
                     return FoodCard(
+                      key: ValueKey(food.id),
                       food: food,
                       onEdit: () => _navigateToEditFood(food),
                       onDelete: () {
