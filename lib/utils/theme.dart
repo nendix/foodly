@@ -110,45 +110,53 @@ final class AppTheme {
           );
         }),
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-        displayMedium: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-        titleLarge: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-        titleMedium: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: Colors.white,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: Color(0xFFBDBDBD),
-        ),
-        bodySmall: TextStyle(
-          fontSize: 12,
-          color: Color(0xFF9E9E9E),
-        ),
-        labelMedium: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: Color(0xFF9E9E9E),
-        ),
-      ),
+       textTheme: const TextTheme(
+         displayLarge: TextStyle(
+           fontSize: 32,
+           fontWeight: FontWeight.bold,
+           color: Colors.white,
+           fontFamily: 'Poppins',
+         ),
+         displayMedium: TextStyle(
+           fontSize: 28,
+           fontWeight: FontWeight.bold,
+           color: Colors.white,
+           fontFamily: 'Poppins',
+         ),
+         titleLarge: TextStyle(
+           fontSize: 22,
+           fontWeight: FontWeight.bold,
+           color: Colors.white,
+           fontFamily: 'Poppins',
+         ),
+         titleMedium: TextStyle(
+           fontSize: 16,
+           fontWeight: FontWeight.w600,
+           color: Colors.white,
+           fontFamily: 'Poppins',
+         ),
+         bodyLarge: TextStyle(
+           fontSize: 16,
+           color: Colors.white,
+           fontFamily: 'Poppins',
+         ),
+         bodyMedium: TextStyle(
+           fontSize: 14,
+           color: Color(0xFFBDBDBD),
+           fontFamily: 'Poppins',
+         ),
+         bodySmall: TextStyle(
+           fontSize: 12,
+           color: Color(0xFF9E9E9E),
+           fontFamily: 'Poppins',
+         ),
+         labelMedium: TextStyle(
+           fontSize: 12,
+           fontWeight: FontWeight.w500,
+           color: Color(0xFF9E9E9E),
+           fontFamily: 'Poppins',
+         ),
+       ),
     );
   }
 }
