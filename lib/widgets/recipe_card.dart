@@ -10,51 +10,77 @@ class RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
               ),
-              child: Image.network(
-                recipe.image,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 180,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported),
-                  );
-                },
+              child: Stack(
+                children: [
+                  Image.network(
+                    recipe.image,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200,
+                        color: const Color(0xFF2D2D2D),
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.4),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      height: 60,
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     recipe.title,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        'ingredients: ${recipe.possessedCount} out of ${recipe.possessedCount + recipe.missingCount} ',
-                        style: TextStyle(fontSize: 13),
-                      ),
-                    ],
+                  const SizedBox(height: 12),
+                  Text(
+                    'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: const Color(0xFFBDBDBD),
+                    ),
                   ),
                 ],
               ),
