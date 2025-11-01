@@ -76,13 +76,13 @@ class RecipeCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 12),
-                   Text(
-                     'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
-                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                       fontSize: 12,
-                       color: AppColors.textGreyLight,
-                     ),
-                   ),
+                  Text(
+                    'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: AppColors.textGreyLight,
+                    ),
+                  ),
                 ],
               ),
             ),

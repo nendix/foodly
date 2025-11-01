@@ -57,7 +57,8 @@ class _FoodScreenState extends State<FoodScreen> {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: _notifier.expiryDate ?? DateTime(now.year, now.month + 1, now.day),
+      initialDate:
+          _notifier.expiryDate ?? DateTime(now.year, now.month + 1, now.day),
       firstDate: now,
       lastDate: DateTime(now.year + 5),
     );
@@ -92,7 +93,7 @@ class _FoodScreenState extends State<FoodScreen> {
               title: Text(widget.food == null ? 'Add Food' : 'Edit Food'),
             ),
             body: SingleChildScrollView(
-              padding: AppSpacing.paddingLg,
+              padding: EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

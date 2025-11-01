@@ -9,19 +9,19 @@ class SpoonacularService {
 
   Future<List<Recipe>> findByIngredients(List<String> ingredients) async {
     if (ingredients.isEmpty) return [];
-    
+
     try {
       final ingredientList = ingredients.join(',');
       final url =
           '$baseUrl/findByIngredients?ingredients=$ingredientList&number=10&ranking=2&apiKey=$apiKey';
 
       final response = await _apiService.get(url);
-      
-       if (response is List) {
-         return (response)
-             .map((item) => Recipe.fromJson(item as Map<String, dynamic>))
-             .toList();
-       }
+
+      if (response is List) {
+        return (response)
+            .map((item) => Recipe.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
       return [];
     } catch (e) {
       rethrow;

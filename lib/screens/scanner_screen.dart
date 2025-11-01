@@ -150,7 +150,7 @@ class _ScannerScreenContent extends StatelessWidget {
               right: 0,
               child: SafeArea(
                 child: Padding(
-                  padding: AppSpacing.paddingXl,
+                  padding: EdgeInsets.all(AppSpacing.xl),
                   child: Center(
                     child: Text(
                       'Point camera at barcode',

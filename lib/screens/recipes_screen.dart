@@ -82,7 +82,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
         return Column(
           children: [
             Padding(
-              padding: AppSpacing.paddingLg,
+              padding: EdgeInsets.all(AppSpacing.lg),
               child: SearchBar(
                 controller: _searchController,
                 hintText: 'Search recipes...',
@@ -116,7 +116,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
             else
               Expanded(
                 child: ListView.separated(
-                  padding: AppSpacing.paddingLg,
+                  padding: EdgeInsets.all(AppSpacing.lg),
                   itemCount: notifier.filteredRecipes!.length,
                   separatorBuilder: (context, index) =>
                       SizedBox(height: AppSpacing.md),
@@ -145,7 +145,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
           child: Padding(
-            padding: AppSpacing.paddingLg,
+            padding: EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

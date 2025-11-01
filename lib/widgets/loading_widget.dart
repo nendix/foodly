@@ -4,10 +4,7 @@ import '../theme/theme.dart';
 class LoadingWidget extends StatefulWidget {
   final String message;
 
-  const LoadingWidget({
-    super.key,
-    this.message = 'Loading...',
-  });
+  const LoadingWidget({super.key, this.message = 'Loading...'});
 
   @override
   State<LoadingWidget> createState() => _LoadingWidgetState();
@@ -67,10 +64,7 @@ class _LoadingWidgetState extends State<LoadingWidget>
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
-                        ),
+                        border: Border.all(color: Colors.white, width: 3),
                       ),
                     ),
                   ),
@@ -79,13 +73,13 @@ class _LoadingWidgetState extends State<LoadingWidget>
             ),
           ),
           const SizedBox(height: 24),
-           Text(
-             widget.message,
-             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-               color: AppColors.textGreyLight,
-               fontWeight: FontWeight.w500,
-             ),
-           ),
+          Text(
+            widget.message,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: AppColors.textGreyLight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );

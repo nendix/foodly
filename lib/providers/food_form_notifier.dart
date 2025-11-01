@@ -24,9 +24,7 @@ class FoodFormNotifier extends ChangeNotifier {
     quantityController = TextEditingController(
       text: initialFood?.quantity.toString() ?? '1',
     );
-    barcodeController = TextEditingController(
-      text: initialFood?.barcode ?? '',
-    );
+    barcodeController = TextEditingController(text: initialFood?.barcode ?? '');
     expiryDate = initialFood?.expiryDate;
     selectedUnit = initialFood?.unit ?? 'g';
   }

@@ -18,12 +18,16 @@ class Recipe {
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
-    final possessedIng = (json['usedIngredients'] as List?)
-        ?.map((e) => e['original'] as String)
-        .toList() ?? [];
-    final missingIng = (json['missedIngredients'] as List?)
-        ?.map((e) => e['original'] as String)
-        .toList() ?? [];
+    final possessedIng =
+        (json['usedIngredients'] as List?)
+            ?.map((e) => e['original'] as String)
+            .toList() ??
+        [];
+    final missingIng =
+        (json['missedIngredients'] as List?)
+            ?.map((e) => e['original'] as String)
+            .toList() ??
+        [];
 
     return Recipe(
       id: json['id'] as int,

@@ -26,9 +26,7 @@ class ApiService {
 
   Future<dynamic> get(String url) async {
     try {
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(timeout);
+      final response = await http.get(Uri.parse(url)).timeout(timeout);
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

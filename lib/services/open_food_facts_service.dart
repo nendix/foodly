@@ -8,7 +8,7 @@ class OpenFoodFactsService {
   Future<FoodDTO?> searchByBarcode(String barcode) async {
     try {
       final data = await _apiService.get('$baseUrl/product/$barcode.json');
-      
+
       if (data['status'] == 1 && data['product'] != null) {
         return FoodDTO.fromJson(data['product'] as Map<String, dynamic>);
       }
@@ -24,10 +24,12 @@ class OpenFoodFactsService {
         '$baseUrl/cgi/search.pl?search_terms=$query&json=1&page_size=10',
       );
 
-      final products = (data['products'] as List?)
-          ?.cast<Map<String, dynamic>>()
-          .map(FoodDTO.fromJson)
-          .toList() ?? [];
+      final products =
+          (data['products'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(FoodDTO.fromJson)
+              .toList() ??
+          [];
 
       return products;
     } catch (e) {

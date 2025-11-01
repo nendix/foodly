@@ -233,11 +233,11 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                               const SizedBox(height: 8),
                               Row(
                                 children: [
-                                   Icon(
-                                     Icons.scale,
-                                     size: 16,
-                                     color: AppColors.accentOrange,
-                                   ),
+                                  Icon(
+                                    Icons.scale,
+                                    size: 16,
+                                    color: AppColors.accentOrange,
+                                  ),
                                   const SizedBox(width: 6),
                                   Text(
                                     '${widget.food.quantity} ${widget.food.unit}',

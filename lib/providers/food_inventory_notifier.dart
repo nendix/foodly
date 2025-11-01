@@ -13,7 +13,7 @@ class FoodInventoryNotifier extends ChangeNotifier {
   }
 
   String get searchQuery => _searchQuery;
-  
+
   String? get error => _error;
 
   FoodInventoryNotifier() {

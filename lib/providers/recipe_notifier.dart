@@ -20,8 +20,10 @@ class RecipeNotifier extends ChangeNotifier {
     List<Recipe> filtered = _recipes!;
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
-          .where((recipe) =>
-              recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (recipe) =>
+                recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
           .toList();
     }
     return filtered;

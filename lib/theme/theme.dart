@@ -7,16 +7,6 @@ final class AppSpacing {
   static const double lg = 16;
   static const double xl = 24;
   static const double xxl = 32;
-
-  static const EdgeInsets paddingXs = EdgeInsets.all(4);
-  static const EdgeInsets paddingSm = EdgeInsets.all(8);
-  static const EdgeInsets paddingMd = EdgeInsets.all(12);
-  static const EdgeInsets paddingLg = EdgeInsets.all(16);
-  static const EdgeInsets paddingXl = EdgeInsets.all(24);
-  static const EdgeInsets paddingXxl = EdgeInsets.all(32);
-
-  static const EdgeInsets paddingHorizontalLg = EdgeInsets.symmetric(horizontal: 16);
-  static const EdgeInsets paddingVerticalLg = EdgeInsets.symmetric(vertical: 16);
 }
 
 final class AppColors {
@@ -55,9 +45,7 @@ final class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: AppColors.surfaceContainer,
         margin: EdgeInsets.zero,
       ),
@@ -79,7 +67,10 @@ final class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceContainer,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.surfaceContainer),
@@ -183,14 +174,4 @@ final class AppTheme {
       ),
     );
   }
-}
-
-extension AppTextThemeExtensions on TextTheme {
-  TextStyle? get bodyLargeMediumWeight => bodyLarge?.copyWith(
-    fontWeight: FontWeight.w500,
-  );
-
-  TextStyle? get titleLargeMediumWeight => titleLarge?.copyWith(
-    fontWeight: FontWeight.w500,
-  );
 }
