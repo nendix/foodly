@@ -1,34 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/food.dart';
 import '../models/recipe.dart';
-import '../services/spoonacular_service.dart';
+import '../theme/theme.dart';
+import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
-import '../services/connectivity_service.dart';
-import '../widgets/snackbar_helper.dart';
+import '../providers/recipe_notifier.dart';
 
-class RecipesScreen extends StatefulWidget {
+class RecipesScreen extends StatelessWidget {
   final List<Food> foods;
 
   const RecipesScreen({super.key, required this.foods});
 
   @override
-  State<RecipesScreen> createState() => _RecipesScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => RecipeNotifier()..loadRecipes(foods),
+      child: _RecipesScreenContent(foods: foods),
+    );
+  }
 }
 
-class _RecipesScreenState extends State<RecipesScreen> {
-  late SpoonacularService _recipeService;
-  List<Recipe>? _recipes;
-  List<Recipe>? _filteredRecipes;
-  bool _isLoading = false;
-  String _searchQuery = '';
-  final TextEditingController _searchController = TextEditingController();
+class _RecipesScreenContent extends StatefulWidget {
+  final List<Food> foods;
+
+  const _RecipesScreenContent({required this.foods});
+
+  @override
+  State<_RecipesScreenContent> createState() => _RecipesScreenContentState();
+}
+
+class _RecipesScreenContentState extends State<_RecipesScreenContent> {
+  late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
-    _recipeService = SpoonacularService();
-    _loadRecipes();
+    _searchController = TextEditingController();
   }
 
   @override
@@ -37,210 +46,92 @@ class _RecipesScreenState extends State<RecipesScreen> {
     super.dispose();
   }
 
-  Future<void> _loadRecipes() async {
-    if (widget.foods.isEmpty) return;
-
-    if (!await hasInternetConnection()) {
-      if (mounted) {
-        showErrorSnackbar(
-          context,
-          'No internet connection. Please check your connection and try again.',
-        );
-      }
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    try {
-      final ingredients = widget.foods.map((f) => f.name).toList();
-      final recipes = await _recipeService.findByIngredients(ingredients);
-      if (mounted) {
-        recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
-        setState(() {
-          _recipes = recipes;
-          _applySearch();
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorSnackbar(context, e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  void _applySearch() {
-    if (_recipes == null) return;
-
-    List<Recipe> filtered = _recipes!;
-
-    if (_searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where(
-            (recipe) =>
-                recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()),
-          )
-          .toList();
-    }
-
-    setState(() => _filteredRecipes = filtered);
-  }
-
   void _updateSearch(String query) {
-    _searchQuery = query;
-    _applySearch();
+    context.read<RecipeNotifier>().setSearchQuery(query);
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.foods.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-              ),
-              child: Icon(
-                Icons.restaurant_menu,
-                size: 64,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Add foods to get recipe suggestions',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      return EmptyStateWidget(
+        icon: Icons.restaurant_menu,
+        title: 'Add foods to get recipe suggestions',
+        iconColor: Theme.of(context).colorScheme.primary,
+        expanded: false,
       );
     }
 
-    if (_isLoading) {
-      return const LoadingWidget(message: 'Finding recipes...');
-    }
+    return Consumer<RecipeNotifier>(
+      builder: (context, notifier, _) {
+        if (notifier.isLoading) {
+          return const LoadingWidget(message: 'Finding recipes...');
+        }
 
-    if (_recipes == null || _recipes!.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        if (notifier.recipes == null || notifier.recipes!.isEmpty) {
+          return EmptyStateWidget(
+            icon: Icons.no_meals,
+            title: 'No recipes found',
+            iconColor: Theme.of(context).colorScheme.primary,
+            actionLabel: 'Retry',
+            actionIcon: Icons.refresh,
+            onActionPressed: () => notifier.loadRecipes(widget.foods),
+            expanded: false,
+          );
+        }
+
+        return Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+            Padding(
+              padding: AppSpacing.paddingLg,
+              child: SearchBar(
+                controller: _searchController,
+                hintText: 'Search recipes...',
+                leading: Icon(
+                  Icons.search,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                trailing: [
+                  if (_searchController.text.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        _updateSearch('');
+                      },
+                    ),
+                ],
+                onChanged: _updateSearch,
               ),
-              child: Icon(
-                Icons.no_meals,
-                size: 64,
-                color: Theme.of(context).colorScheme.primary,
-              ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              'No recipes found',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: _loadRecipes,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: SearchBar(
-            controller: _searchController,
-            hintText: 'Search recipes...',
-            leading: Icon(
-              Icons.search,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            trailing: [
-              if (_searchController.text.isNotEmpty)
-                IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    _updateSearch('');
+            if (notifier.filteredRecipes == null ||
+                notifier.filteredRecipes!.isEmpty)
+              Expanded(
+                child: EmptyStateWidget(
+                  icon: Icons.search_off,
+                  title: 'No recipes match your search',
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  expanded: false,
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.separated(
+                  padding: AppSpacing.paddingLg,
+                  itemCount: notifier.filteredRecipes!.length,
+                  separatorBuilder: (context, index) =>
+                      SizedBox(height: AppSpacing.md),
+                  itemBuilder: (context, index) {
+                    final recipe = notifier.filteredRecipes![index];
+                    return RecipeCard(
+                      recipe: recipe,
+                      onTap: () => showRecipeDetails(context, recipe),
+                    );
                   },
                 ),
-            ],
-            onChanged: _updateSearch,
-          ),
-        ),
-        if (_filteredRecipes == null || _filteredRecipes!.isEmpty)
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.1),
-                    ),
-                    child: Icon(
-                      Icons.search_off,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No recipes match your search',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
               ),
-            ),
-          )
-         else
-           Expanded(
-             child: ListView.separated(
-               padding: const EdgeInsets.all(16),
-               itemCount: _filteredRecipes!.length,
-               separatorBuilder: (context, index) => const SizedBox(height: 12),
-               itemBuilder: (context, index) {
-                 final recipe = _filteredRecipes![index];
-                 return RecipeCard(
-                   recipe: recipe,
-                   onTap: () => showRecipeDetails(context, recipe),
-                 );
-               },
-             ),
-           ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -254,7 +145,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingLg,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -270,14 +161,14 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppSpacing.lg),
                 Text(
                   recipe.title,
                   style: Theme.of(
                     context,
                   ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppSpacing.lg),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
@@ -299,7 +190,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppSpacing.lg),
                 if (recipe.possessedIngredients.isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,10 +200,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppSpacing.md),
                       ...recipe.possessedIngredients.map(
                         (ing) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: EdgeInsets.only(bottom: AppSpacing.sm),
                           child: Row(
                             children: [
                               Container(
@@ -323,7 +214,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                   shape: BoxShape.circle,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              SizedBox(width: AppSpacing.lg - 6),
                               Expanded(
                                 child: Text(
                                   ing,
@@ -334,7 +225,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: AppSpacing.xl),
                     ],
                   ),
                 if (recipe.missingIngredients.isNotEmpty)
@@ -346,10 +237,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppSpacing.md),
                       ...recipe.missingIngredients.map(
                         (ing) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: EdgeInsets.only(bottom: AppSpacing.sm),
                           child: Row(
                             children: [
                               Container(
@@ -360,7 +251,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                   shape: BoxShape.circle,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              SizedBox(width: AppSpacing.lg - 6),
                               Expanded(
                                 child: Text(
                                   ing,
@@ -373,7 +264,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                       ),
                     ],
                   ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppSpacing.xl),
               ],
             ),
           ),

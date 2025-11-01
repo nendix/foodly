@@ -1,5 +1,24 @@
 import 'package:flutter/material.dart';
 
+final class AppSpacing {
+  static const double xs = 4;
+  static const double sm = 8;
+  static const double md = 12;
+  static const double lg = 16;
+  static const double xl = 24;
+  static const double xxl = 32;
+
+  static const EdgeInsets paddingXs = EdgeInsets.all(4);
+  static const EdgeInsets paddingSm = EdgeInsets.all(8);
+  static const EdgeInsets paddingMd = EdgeInsets.all(12);
+  static const EdgeInsets paddingLg = EdgeInsets.all(16);
+  static const EdgeInsets paddingXl = EdgeInsets.all(24);
+  static const EdgeInsets paddingXxl = EdgeInsets.all(32);
+
+  static const EdgeInsets paddingHorizontalLg = EdgeInsets.symmetric(horizontal: 16);
+  static const EdgeInsets paddingVerticalLg = EdgeInsets.symmetric(vertical: 16);
+}
+
 final class AppColors {
   static const Color accentOrange = Color(0xFFFF9800);
   static const Color accentOrangeLight = Color(0xFFFFB74D);
@@ -164,4 +183,14 @@ final class AppTheme {
       ),
     );
   }
+}
+
+extension AppTextThemeExtensions on TextTheme {
+  TextStyle? get bodyLargeMediumWeight => bodyLarge?.copyWith(
+    fontWeight: FontWeight.w500,
+  );
+
+  TextStyle? get titleLargeMediumWeight => titleLarge?.copyWith(
+    fontWeight: FontWeight.w500,
+  );
 }

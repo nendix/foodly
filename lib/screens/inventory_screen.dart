@@ -128,7 +128,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
             ),
             if (foods.isEmpty)
-              EmptyStateWidget(searchQuery: _searchController.text)
+              EmptyStateWidget(
+                icon: Icons.inbox_outlined,
+                title: _searchController.text.isNotEmpty
+                    ? 'No foods match your search'
+                    : 'No foods added yet',
+                subtitle: 'Tap the + button to add a food item',
+              )
             else
               Expanded(
                 child: ListView.builder(
