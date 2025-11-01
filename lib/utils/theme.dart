@@ -22,12 +22,13 @@ final class AppTheme {
         error: Colors.red,
         onError: Colors.white,
       ),
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        backgroundColor: _surfaceDark,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-      ),
+       appBarTheme: const AppBarTheme(
+         elevation: 0,
+         scrolledUnderElevation: 0,
+         backgroundColor: _surfaceDark,
+         foregroundColor: Colors.white,
+         centerTitle: true,
+       ),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
