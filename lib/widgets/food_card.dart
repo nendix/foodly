@@ -71,6 +71,13 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
     return 'expires in $daysLeft days';
   }
 
+  Color get _expiryColor {
+    if (widget.food.expiryDate == null) return Colors.grey;
+    if (widget.food.isExpired) return Colors.red;
+    if (widget.food.daysUntilExpiry! <= 3) return Colors.orange;
+    return Colors.green;
+  }
+
   void _onHorizontalDragStart(DragStartDetails details) {
     _isDragging = true;
   }
@@ -162,7 +169,11 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                         child: Container(
                           alignment: Alignment.centerLeft,
                           padding: const EdgeInsets.only(left: 16),
-                          child: Icon(Icons.edit, color: Colors.grey, size: 24),
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.grey,
+                            size: 24,
+                          ),
                         ),
                       ),
                     ),
@@ -174,7 +185,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                         child: Container(
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 16),
-                          child: Icon(
+                          child: const Icon(
                             Icons.delete,
                             color: Colors.grey,
                             size: 24,
@@ -194,33 +205,69 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                   onHorizontalDragUpdate: _onHorizontalDragUpdate,
                   onHorizontalDragEnd: _onHorizontalDragEnd,
                   child: Card(
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.food.name,
-                              style: Theme.of(context).textTheme.titleMedium,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${widget.food.quantity} ${widget.food.unit}',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _expiryStatus,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.food.name,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.scale,
+                                    size: 16,
+                                    color: const Color(0xFFFF9800),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '${widget.food.quantity} ${widget.food.unit}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 14,
+                                    color: _expiryColor,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _expiryStatus,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: _expiryColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
