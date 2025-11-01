@@ -13,9 +13,6 @@ class Food extends HiveObject {
   @HiveField(2)
   late String? barcode;
 
-  @HiveField(3)
-  late String? imageUrl;
-
   @HiveField(4)
   late int quantity;
 
@@ -32,19 +29,21 @@ class Food extends HiveObject {
     required this.id,
     required this.name,
     required this.quantity,
-     this.unit = 'g',
+    this.unit = 'g',
     this.barcode,
-    this.imageUrl,
     DateTime? addedDate,
     this.expiryDate,
   }) : addedDate = addedDate ?? DateTime.now();
-
 
   int? get daysUntilExpiry {
     if (expiryDate == null) return null;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final expiryDay = DateTime(expiryDate!.year, expiryDate!.month, expiryDate!.day);
+    final expiryDay = DateTime(
+      expiryDate!.year,
+      expiryDate!.month,
+      expiryDate!.day,
+    );
     return expiryDay.difference(today).inDays;
   }
 
@@ -54,17 +53,10 @@ class Food extends HiveObject {
     return daysLeft != null && daysLeft < 0;
   }
 
-  bool get expiringSoon {
-    if (expiryDate == null) return false;
-    final daysLeft = daysUntilExpiry;
-    return daysLeft != null && daysLeft <= 3 && daysLeft > 0;
-  }
-
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
     'barcode': barcode,
-    'imageUrl': imageUrl,
     'quantity': quantity,
     'unit': unit,
     'addedDate': addedDate.toIso8601String(),
@@ -75,7 +67,6 @@ class Food extends HiveObject {
     id: json['id'] as String,
     name: json['name'] as String,
     barcode: json['barcode'] as String?,
-    imageUrl: json['imageUrl'] as String?,
     quantity: json['quantity'] as int? ?? 1,
     unit: json['unit'] as String? ?? 'g',
     addedDate: json['addedDate'] != null

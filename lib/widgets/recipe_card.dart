@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/recipe.dart';
+import '../utils/theme.dart';
 
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
@@ -31,7 +32,7 @@ class RecipeCard extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         height: 200,
-                        color: const Color(0xFF2D2D2D),
+                        color: AppColors.surfaceContainer,
                         child: const Icon(
                           Icons.image_not_supported,
                           color: Colors.grey,
@@ -75,13 +76,13 @@ class RecipeCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 12,
-                      color: const Color(0xFFBDBDBD),
-                    ),
-                  ),
+                   Text(
+                     'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
+                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                       fontSize: 12,
+                       color: AppColors.textGreyLight,
+                     ),
+                   ),
                 ],
               ),
             ),

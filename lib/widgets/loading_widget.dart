@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/theme.dart';
 
 class LoadingWidget extends StatefulWidget {
   final String message;
@@ -45,7 +46,7 @@ class _LoadingWidgetState extends State<LoadingWidget>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFFFF9800).withValues(alpha: 0.3),
+                  color: AppColors.accentOrange.withValues(alpha: 0.3),
                   width: 3,
                 ),
               ),
@@ -56,8 +57,8 @@ class _LoadingWidgetState extends State<LoadingWidget>
                     shaderCallback: (bounds) {
                       return SweepGradient(
                         colors: [
-                          const Color(0xFFFF9800).withValues(alpha: 0),
-                          const Color(0xFFFF9800),
+                          AppColors.accentOrange.withValues(alpha: 0),
+                          AppColors.accentOrange,
                         ],
                         startAngle: 0,
                         endAngle: 6.28,
@@ -78,13 +79,13 @@ class _LoadingWidgetState extends State<LoadingWidget>
             ),
           ),
           const SizedBox(height: 24),
-          Text(
-            widget.message,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: const Color(0xFFBDBDBD),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+           Text(
+             widget.message,
+             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+               color: AppColors.textGreyLight,
+               fontWeight: FontWeight.w500,
+             ),
+           ),
         ],
       ),
     );

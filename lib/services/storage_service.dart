@@ -31,13 +31,4 @@ class StorageService {
   Future<void> deleteFood(String id) async {
     await _foodBox.delete(id);
   }
-
-  List<Food> searchFoods(String query) {
-    final allFoods = getAllFoods();
-    return allFoods
-        .where((food) =>
-            food.name.toLowerCase().contains(query.toLowerCase()) ||
-            (food.barcode?.contains(query) ?? false))
-        .toList();
-  }
 }
