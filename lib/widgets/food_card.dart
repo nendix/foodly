@@ -230,15 +230,15 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 8),
+                              SizedBox(height: AppSpacing.sm),
                               Row(
                                 children: [
                                   Icon(
                                     Icons.scale,
                                     size: 16,
-                                    color: AppColors.accentOrange,
+                                    color: Colors.grey,
                                   ),
-                                  const SizedBox(width: 6),
+                                  SizedBox(width: AppSpacing.xs),
                                   Text(
                                     '${widget.food.quantity} ${widget.food.unit}',
                                     style: Theme.of(context)
@@ -248,7 +248,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 6),
+                              SizedBox(height: AppSpacing.xs),
                               Row(
                                 children: [
                                   Icon(
@@ -256,7 +256,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                     size: 14,
                                     color: _expiryColor,
                                   ),
-                                  const SizedBox(width: 6),
+                                  SizedBox(width: AppSpacing.xs),
                                   Text(
                                     _expiryStatus,
                                     style: Theme.of(context).textTheme.bodySmall

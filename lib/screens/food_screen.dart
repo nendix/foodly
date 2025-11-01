@@ -124,20 +124,18 @@ class _FoodScreenState extends State<FoodScreen> {
                         ),
                       ),
                       SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: DropdownMenu(
-                          initialSelection: notifier.selectedUnit,
-                          onSelected: (value) {
-                            notifier.setUnit(value ?? 'g');
-                          },
-                          dropdownMenuEntries: const [
-                            DropdownMenuEntry(value: 'g', label: 'g'),
-                            DropdownMenuEntry(value: 'kg', label: 'kg'),
-                            DropdownMenuEntry(value: 'ml', label: 'ml'),
-                            DropdownMenuEntry(value: 'L', label: 'L'),
-                            DropdownMenuEntry(value: 'pcs', label: 'pcs'),
-                          ],
-                        ),
+                      DropdownMenu(
+                        initialSelection: notifier.selectedUnit,
+                        onSelected: (value) {
+                          notifier.setUnit(value ?? 'g');
+                        },
+                        dropdownMenuEntries: const [
+                          DropdownMenuEntry(value: 'g', label: 'g'),
+                          DropdownMenuEntry(value: 'kg', label: 'kg'),
+                          DropdownMenuEntry(value: 'ml', label: 'ml'),
+                          DropdownMenuEntry(value: 'L', label: 'L'),
+                          DropdownMenuEntry(value: 'pcs', label: 'pcs'),
+                        ],
                       ),
                     ],
                   ),

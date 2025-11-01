@@ -251,7 +251,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
                                   shape: BoxShape.circle,
                                 ),
                               ),
-                              SizedBox(width: AppSpacing.lg - 6),
+                              SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Text(
                                   ing,

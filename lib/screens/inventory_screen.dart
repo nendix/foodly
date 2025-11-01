@@ -57,7 +57,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           title: Row(
             children: [
               Icon(Icons.restaurant, color: AppColors.accentOrange),
-              const SizedBox(width: 8),
+              SizedBox(width: AppSpacing.xxs),
               Text(
                 'foodly',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
