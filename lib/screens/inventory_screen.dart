@@ -1,81 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/food.dart';
-import '../services/storage_service.dart';
+import '../providers/food_inventory_notifier.dart';
+import '../services/navigation_service.dart';
+import '../theme/theme.dart';
 import '../widgets/food_card.dart';
-import 'add_edit_food_screen.dart';
+import '../widgets/empty_state_widget.dart';
 import 'recipes_screen.dart';
 
-class FoodInventoryNotifier extends ChangeNotifier {
-  final StorageService _storageService = StorageService();
-  List<Food> _foods = [];
-  String _searchQuery = '';
-
-  List<Food> get foods {
-    return _getFilteredFoods();
-  }
-
-  String get searchQuery => _searchQuery;
-
-  FoodInventoryNotifier() {
-    _loadFoods();
-  }
-
-  void _loadFoods() {
-    _foods = _storageService.getAllFoods();
-    notifyListeners();
-  }
-
-  void setSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
-  }
-
-  List<Food> _getFilteredFoods() {
-    List<Food> filtered = _foods;
-
-    if (_searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where(
-            (food) =>
-                food.name.toLowerCase().contains(_searchQuery.toLowerCase()),
-          )
-          .toList();
-    }
-
-    return filtered;
-  }
-
-  void addFood(Food food) {
-    _storageService.addFood(food);
-    _loadFoods();
-  }
-
-  void updateFood(Food food) {
-    _storageService.updateFood(food);
-    _loadFoods();
-  }
-
-  void deleteFood(String id) {
-    _storageService.deleteFood(id);
-    _loadFoods();
-  }
-
-  List<Food> searchFoods(String query) {
-    return _storageService.searchFoods(query);
-  }
-}
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class InventoryScreen extends StatefulWidget {
+  const InventoryScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<InventoryScreen> createState() => _InventoryScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _InventoryScreenState extends State<InventoryScreen> {
   late FoodInventoryNotifier _notifier;
   final TextEditingController _searchController = TextEditingController();
+  final NavigationService _navigationService = NavigationService();
   int _selectedIndex = 0;
 
   @override
@@ -92,20 +35,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToAddFood() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddEditFoodScreen()),
-    );
+    final result = await _navigationService.navigateToAddFood(context);
     if (result is Food) {
       _notifier.addFood(result);
     }
   }
 
   void _navigateToEditFood(Food food) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddEditFoodScreen(food: food)),
-    );
+    final result = await _navigationService.navigateToEditFood(context, food);
     if (result is Food) {
       _notifier.updateFood(result);
     }
@@ -119,19 +56,19 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: Row(
             children: [
-              Icon(Icons.restaurant, color: const Color(0xFFFF9800)),
+              Icon(Icons.restaurant, color: AppColors.accentOrange),
               const SizedBox(width: 8),
               Text(
                 'foodly',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFFF9800),
+                  color: AppColors.accentOrange,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
           elevation: 0,
-          backgroundColor: const Color(0xFF1E1E1E),
+          backgroundColor: AppColors.surfaceDark,
         ),
         body: _selectedIndex == 0 ? _buildInventoryView() : _buildRecipesView(),
         bottomNavigationBar: NavigationBar(
@@ -191,43 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             if (foods.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2D2D2D),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.inbox_outlined,
-                          size: 64,
-                          color: const Color(0xFFFF9800).withValues(alpha: 0.6),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _searchController.text.isNotEmpty
-                            ? 'No foods match your search'
-                            : 'No foods added yet',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: const Color(0xFFBDBDBD),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Tap the + button to add a food item',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF9E9E9E),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
+              EmptyStateWidget(searchQuery: _searchController.text)
             else
               Expanded(
                 child: ListView.builder(

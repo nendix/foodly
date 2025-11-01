@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/food.dart';
+import '../theme/theme.dart';
 
 class FoodCard extends StatefulWidget {
   final Food food;
@@ -232,11 +233,11 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                               const SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Icon(
-                                    Icons.scale,
-                                    size: 16,
-                                    color: const Color(0xFFFF9800),
-                                  ),
+                                   Icon(
+                                     Icons.scale,
+                                     size: 16,
+                                     color: AppColors.accentOrange,
+                                   ),
                                   const SizedBox(width: 6),
                                   Text(
                                     '${widget.food.quantity} ${widget.food.unit}',

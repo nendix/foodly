@@ -4,8 +4,8 @@ import '../models/recipe.dart';
 import '../services/spoonacular_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
-import '../utils/connectivity_helper.dart';
-import '../utils/snackbar_helper.dart';
+import '../services/connectivity_service.dart';
+import '../widgets/snackbar_helper.dart';
 
 class RecipesScreen extends StatefulWidget {
   final List<Food> foods;
