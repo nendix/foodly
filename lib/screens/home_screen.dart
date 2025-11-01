@@ -91,25 +91,25 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-   void _navigateToAddFood() async {
-     final result = await Navigator.push(
-       context,
-       MaterialPageRoute(builder: (context) => const AddEditFoodScreen()),
-     );
-     if (result is Food) {
-       _notifier.addFood(result);
-     }
-   }
+  void _navigateToAddFood() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddEditFoodScreen()),
+    );
+    if (result is Food) {
+      _notifier.addFood(result);
+    }
+  }
 
-   void _navigateToEditFood(Food food) async {
-     final result = await Navigator.push(
-       context,
-       MaterialPageRoute(builder: (context) => AddEditFoodScreen(food: food)),
-     );
-     if (result is Food) {
-       _notifier.updateFood(result);
-     }
-   }
+  void _navigateToEditFood(Food food) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddEditFoodScreen(food: food)),
+    );
+    if (result is Food) {
+      _notifier.updateFood(result);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,9 +117,21 @@ class _HomeScreenState extends State<HomeScreen> {
       value: _notifier,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('foodly'),
-          centerTitle: true,
+          title: Row(
+            children: [
+              Icon(Icons.restaurant, color: const Color(0xFFFF9800)),
+              const SizedBox(width: 8),
+              Text(
+                'foodly',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFFF9800),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
           elevation: 0,
+          backgroundColor: const Color(0xFF1E1E1E),
         ),
         body: _selectedIndex == 0 ? _buildInventoryView() : _buildRecipesView(),
         bottomNavigationBar: NavigationBar(
@@ -184,19 +196,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.inbox_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2D2D2D),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.inbox_outlined,
+                          size: 64,
+                          color: const Color(0xFFFF9800).withValues(alpha: 0.6),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         _searchController.text.isNotEmpty
                             ? 'No foods match your search'
                             : 'No foods added yet',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: const Color(0xFFBDBDBD),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tap the + button to add a food item',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF9E9E9E),
+                        ),
                       ),
                     ],
                   ),
@@ -212,13 +238,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: foods.length,
                   itemBuilder: (context, index) {
                     final food = foods[index];
-                    return FoodCard(
-                      key: ValueKey(food.id),
-                      food: food,
-                      onEdit: () => _navigateToEditFood(food),
-                      onDelete: () {
-                        _notifier.deleteFood(food.id);
-                      },
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: FoodCard(
+                        key: ValueKey(food.id),
+                        food: food,
+                        onEdit: () => _navigateToEditFood(food),
+                        onDelete: () {
+                          _notifier.deleteFood(food.id);
+                        },
+                      ),
                     );
                   },
                 ),
