@@ -30,8 +30,12 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.food?.name ?? '');
-    _quantityController = TextEditingController(text: widget.food?.quantity.toString() ?? '1');
-    _barcodeController = TextEditingController(text: widget.food?.barcode ?? '');
+    _quantityController = TextEditingController(
+      text: widget.food?.quantity.toString() ?? '1',
+    );
+    _barcodeController = TextEditingController(
+      text: widget.food?.barcode ?? '',
+    );
     _expiryDate = widget.food?.expiryDate;
     _selectedUnit = widget.food?.unit ?? 'g';
   }
@@ -44,98 +48,52 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
     super.dispose();
   }
 
-   Future<void> _scanBarcode() async {
-     if (!await hasInternetConnection()) {
-       if (mounted) {
-         showErrorSnackbar(context, 'No internet connection. Please check your connection and try again.');
-       }
-       return;
-     }
-     
-     if (!mounted) return;
-     
-     final barcode = await Navigator.push<String>(
-       context,
-       MaterialPageRoute(builder: (context) => const ScannerScreen()),
-     );
-     
-     if (!mounted) return;
-     
-     if (barcode != null) {
-       _barcodeController.text = barcode;
-       _fetchProductFromBarcode(barcode);
-     }
-   }
+  Future<void> _scanBarcode() async {
+    if (!await hasInternetConnection()) {
+      if (mounted) {
+        showErrorSnackbar(
+          context,
+          'No internet connection. Please check your connection and try again.',
+        );
+      }
+      return;
+    }
 
-   Future<void> _fetchProductFromBarcode(String barcode) async {
-     setState(() => _isLoading = true);
-     try {
-       final product = await _apiService.searchByBarcode(barcode);
-       if (product != null && mounted) {
-         setState(() {
-           _nameController.text = product.name;
-         });
-       } else if (mounted) {
-         showErrorSnackbar(context, 'Product not found');
-       }
-     } catch (e) {
-       if (mounted) {
-         showErrorSnackbar(context, e.toString());
-       }
-     } finally {
-       if (mounted) {
-         setState(() => _isLoading = false);
-       }
-     }
-   }
+    if (!mounted) return;
 
-   Future<void> _searchByName() async {
-     if (_nameController.text.isEmpty) {
-       showErrorSnackbar(context, 'Enter a product name');
-       return;
-     }
-
-     setState(() => _isLoading = true);
-     try {
-       final products = await _apiService.searchByName(_nameController.text);
-       if (mounted && products.isNotEmpty) {
-         _showProductSelection(products);
-       } else if (mounted) {
-         showErrorSnackbar(context, 'No products found');
-       }
-     } catch (e) {
-       if (mounted) {
-         showErrorSnackbar(context, e.toString());
-       }
-     } finally {
-       if (mounted) {
-         setState(() => _isLoading = false);
-       }
-     }
-   }
-
-  void _showProductSelection(products) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ListTile(
-            title: Text(product.name),
-            subtitle: Text(product.brand ?? 'Unknown brand'),
-            onTap: () {
-              _nameController.text = product.name;
-              if (product.barcode != null) {
-                _barcodeController.text = product.barcode!;
-              }
-              Navigator.pop(context);
-              setState(() {});
-            },
-          );
-        },
-      ),
+    final barcode = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const ScannerScreen()),
     );
+
+    if (!mounted) return;
+
+    if (barcode != null) {
+      _barcodeController.text = barcode;
+      _fetchProductFromBarcode(barcode);
+    }
+  }
+
+  Future<void> _fetchProductFromBarcode(String barcode) async {
+    setState(() => _isLoading = true);
+    try {
+      final product = await _apiService.searchByBarcode(barcode);
+      if (product != null && mounted) {
+        setState(() {
+          _nameController.text = product.name;
+        });
+      } else if (mounted) {
+        showErrorSnackbar(context, 'Product not found');
+      }
+    } catch (e) {
+      if (mounted) {
+        showErrorSnackbar(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _selectExpiryDate() async {
@@ -150,36 +108,36 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
     }
   }
 
-   void _saveFoodItem() {
-     if (_nameController.text.isEmpty) {
-       showErrorSnackbar(context, 'Food name is required');
-       return;
-     }
+  void _saveFoodItem() {
+    if (_nameController.text.isEmpty) {
+      showErrorSnackbar(context, 'Food name is required');
+      return;
+    }
 
-     if (int.tryParse(_quantityController.text) == null || int.parse(_quantityController.text) <= 0) {
-       showErrorSnackbar(context, 'Quantity must be a positive number');
-       return;
-     }
+    if (int.tryParse(_quantityController.text) == null ||
+        int.parse(_quantityController.text) <= 0) {
+      showErrorSnackbar(context, 'Quantity must be a positive number');
+      return;
+    }
 
-     final food = Food(
-       id: widget.food?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-       name: _nameController.text.trim(),
-       quantity: int.parse(_quantityController.text),
-       unit: _selectedUnit,
-       barcode: _barcodeController.text.isEmpty ? null : _barcodeController.text,
-       expiryDate: _expiryDate,
-       addedDate: widget.food?.addedDate ?? DateTime.now(),
-     );
+    final food = Food(
+      id: widget.food?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      name: _nameController.text.trim(),
+      quantity: int.parse(_quantityController.text),
+      unit: _selectedUnit,
+      barcode: _barcodeController.text.isEmpty ? null : _barcodeController.text,
+      expiryDate: _expiryDate,
+      addedDate: widget.food?.addedDate ?? DateTime.now(),
+    );
 
-     Navigator.pop(context, food);
-   }
+    Navigator.pop(context, food);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.food == null ? 'Add Food' : 'Edit Food'),
-        centerTitle: true,
       ),
       body: _isLoading
           ? const LoadingWidget()
@@ -188,14 +146,14 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildSectionTitle(context, 'Basic Information'),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: 'Food Name *',
                       hintText: 'Enter food name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      prefixIcon: const Icon(Icons.restaurant_menu),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -206,9 +164,7 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
                           controller: _quantityController,
                           decoration: InputDecoration(
                             labelText: 'Quantity *',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            prefixIcon: const Icon(Icons.scale),
                           ),
                           keyboardType: TextInputType.number,
                         ),
@@ -219,12 +175,13 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
                           initialValue: _selectedUnit,
                           decoration: InputDecoration(
                             labelText: 'Unit',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            prefixIcon: const Icon(Icons.straighten),
                           ),
                           items: ['pcs', 'kg', 'g', 'l', 'ml']
-                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                              .map(
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
+                              )
                               .toList(),
                           onChanged: (value) {
                             if (value != null) {
@@ -233,56 +190,63 @@ class _AddEditFoodScreenState extends State<AddEditFoodScreen> {
                           },
                         ),
                       ),
-                   ],
-                   ),
-                   const SizedBox(height: 16),
-                   TextField(
-                     controller: _barcodeController,
-                     decoration: InputDecoration(
-                       labelText: 'Barcode',
-                       hintText: 'Enter or scan barcode',
-                       border: OutlineInputBorder(
-                         borderRadius: BorderRadius.circular(8),
-                       ),
-                       suffixIcon: IconButton(
-                         icon: const Icon(Icons.qr_code_scanner),
-                         onPressed: _scanBarcode,
-                       ),
-                     ),
-                   ),
-                   const SizedBox(height: 16),
-                   ListTile(
-                    title: Text(
-                      _expiryDate == null
-                          ? 'Set Expiry Date (Optional)'
-                          : 'Expires: ${_expiryDate!.toLocal().toString().split(' ')[0]}',
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.calendar_today),
-                      onPressed: _selectExpiryDate,
-                    ),
+                    ],
                   ),
                   const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _searchByName,
-                          child: const Text('Search Product'),
-                        ),
+                  _buildSectionTitle(context, 'Additional Details'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _barcodeController,
+                    decoration: InputDecoration(
+                      labelText: 'Barcode',
+                      hintText: 'Enter or scan barcode',
+                      prefixIcon: const Icon(Icons.barcode_reader),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.qr_code_scanner),
+                        onPressed: _scanBarcode,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _saveFoodItem,
-                          child: Text(widget.food == null ? 'Add Food' : 'Update Food'),
-                        ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.calendar_today,
+                        color: Color(0xFFFF9800),
                       ),
-                    ],
+                      title: Text(
+                        _expiryDate == null
+                            ? 'Set Expiry Date (Optional)'
+                            : 'Expires: ${_expiryDate!.toLocal().toString().split(' ')[0]}',
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: _selectExpiryDate,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _saveFoodItem,
+                      icon: const Icon(Icons.save),
+                      label: Text(widget.food == null ? 'Add Food' : 'Update'),
+                    ),
                   ),
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        color: const Color(0xFFFF9800),
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 }
