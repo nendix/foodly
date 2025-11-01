@@ -98,9 +98,7 @@ final class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.accentOrange,
-        ),
+        style: TextButton.styleFrom(foregroundColor: AppColors.accentOrange),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surfaceDark,
@@ -119,10 +117,7 @@ final class AppTheme {
               fontWeight: FontWeight.w500,
             );
           }
-          return const TextStyle(
-            color: AppColors.textGrey,
-            fontSize: 12,
-          );
+          return const TextStyle(color: AppColors.textGrey, fontSize: 12);
         }),
       ),
       textTheme: const TextTheme(

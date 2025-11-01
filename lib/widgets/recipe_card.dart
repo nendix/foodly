@@ -62,7 +62,7 @@ class RecipeCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(14),
+              padding: EdgeInsets.all(AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -75,7 +75,7 @@ class RecipeCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppSpacing.md),
                   Text(
                     'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

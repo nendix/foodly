@@ -169,7 +169,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                             : 0,
                         child: Container(
                           alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.only(left: 16),
+                          padding: EdgeInsets.only(left: AppSpacing.lg),
                           child: const Icon(
                             Icons.edit,
                             color: Colors.grey,
@@ -185,7 +185,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                             : 0,
                         child: Container(
                           alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 16),
+                          padding: EdgeInsets.only(right: AppSpacing.lg),
                           child: const Icon(
                             Icons.delete,
                             color: Colors.grey,
@@ -213,9 +213,9 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                       child: SizedBox(
                         width: double.infinity,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                            vertical: AppSpacing.md,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

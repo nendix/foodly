@@ -34,7 +34,7 @@ class EmptyStateWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(AppSpacing.xl),
             decoration: const BoxDecoration(
               color: AppColors.surfaceContainer,
               shape: BoxShape.circle,
@@ -45,7 +45,7 @@ class EmptyStateWidget extends StatelessWidget {
               color: iconColor ?? AppColors.accentOrange.withValues(alpha: 0.6),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppSpacing.xxl),
           Text(
             title,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -55,7 +55,7 @@ class EmptyStateWidget extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           if (subtitle != null) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: AppSpacing.sm),
             Text(
               subtitle!,
               style: Theme.of(
@@ -65,7 +65,7 @@ class EmptyStateWidget extends StatelessWidget {
             ),
           ],
           if (onActionPressed != null && actionLabel != null) ...[
-            const SizedBox(height: 32),
+            SizedBox(height: AppSpacing.xxl),
             ElevatedButton.icon(
               onPressed: onActionPressed,
               icon: Icon(actionIcon ?? Icons.refresh),

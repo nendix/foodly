@@ -107,7 +107,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppSpacing.lg),
               child: SearchBar(
                 controller: _searchController,
                 hintText: 'Search foods...',
@@ -138,15 +138,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
             else
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
                   ),
                   itemCount: foods.length,
                   itemBuilder: (context, index) {
                     final food = foods[index];
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: EdgeInsets.only(bottom: AppSpacing.sm),
                       child: FoodCard(
                         key: ValueKey(food.id),
                         food: food,

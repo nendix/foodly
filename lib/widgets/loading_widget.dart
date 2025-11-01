@@ -72,7 +72,7 @@ class _LoadingWidgetState extends State<LoadingWidget>
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppSpacing.xxl),
           Text(
             widget.message,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
