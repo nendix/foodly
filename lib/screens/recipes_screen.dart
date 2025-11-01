@@ -37,37 +37,40 @@ class _RecipesScreenState extends State<RecipesScreen> {
     super.dispose();
   }
 
-   Future<void> _loadRecipes() async {
-     if (widget.foods.isEmpty) return;
+  Future<void> _loadRecipes() async {
+    if (widget.foods.isEmpty) return;
 
-     if (!await hasInternetConnection()) {
-       if (mounted) {
-         showErrorSnackbar(context, 'No internet connection. Please check your connection and try again.');
-       }
-       return;
-     }
+    if (!await hasInternetConnection()) {
+      if (mounted) {
+        showErrorSnackbar(
+          context,
+          'No internet connection. Please check your connection and try again.',
+        );
+      }
+      return;
+    }
 
-     setState(() => _isLoading = true);
-     try {
-       final ingredients = widget.foods.map((f) => f.name).toList();
-       final recipes = await _recipeService.findByIngredients(ingredients);
-       if (mounted) {
-         recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
-         setState(() {
-           _recipes = recipes;
-           _applySearch();
-         });
-       }
-     } catch (e) {
-       if (mounted) {
-         showErrorSnackbar(context, e.toString());
-       }
-     } finally {
-       if (mounted) {
-         setState(() => _isLoading = false);
-       }
-     }
-   }
+    setState(() => _isLoading = true);
+    try {
+      final ingredients = widget.foods.map((f) => f.name).toList();
+      final recipes = await _recipeService.findByIngredients(ingredients);
+      if (mounted) {
+        recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
+        setState(() {
+          _recipes = recipes;
+          _applySearch();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showErrorSnackbar(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   void _applySearch() {
     if (_recipes == null) return;
@@ -76,8 +79,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
-          .where((recipe) =>
-              recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (recipe) =>
+                recipe.title.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
           .toList();
     }
 
@@ -96,17 +101,28 @@ class _RecipesScreenState extends State<RecipesScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.restaurant_menu,
-              size: 64,
-              color: Colors.grey[400],
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+              ),
+              child: Icon(
+                Icons.restaurant_menu,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'Add foods to get recipe suggestions',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                fontWeight: FontWeight.w500,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -122,22 +138,32 @@ class _RecipesScreenState extends State<RecipesScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.no_meals,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No recipes found',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey,
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+              ),
+              child: Icon(
+                Icons.no_meals,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
+            Text(
+              'No recipes found',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
               onPressed: _loadRecipes,
-              child: const Text('Retry'),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
             ),
           ],
         ),
@@ -151,7 +177,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
           child: SearchBar(
             controller: _searchController,
             hintText: 'Search recipes...',
-            leading: const Icon(Icons.search),
+            leading: Icon(
+              Icons.search,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             trailing: [
               if (_searchController.text.isNotEmpty)
                 IconButton(
@@ -171,27 +200,37 @@ class _RecipesScreenState extends State<RecipesScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.search_off,
-                    size: 64,
-                    color: Colors.grey[400],
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
+                    ),
+                    child: Icon(
+                      Icons.search_off,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Text(
                     'No recipes match your search',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
           )
-        else
-          Expanded(
-             child: ListView.builder(
+         else
+           Expanded(
+             child: ListView.separated(
                padding: const EdgeInsets.all(16),
                itemCount: _filteredRecipes!.length,
+               separatorBuilder: (context, index) => const SizedBox(height: 12),
                itemBuilder: (context, index) {
                  final recipe = _filteredRecipes![index];
                  return RecipeCard(
@@ -200,17 +239,16 @@ class _RecipesScreenState extends State<RecipesScreen> {
                  );
                },
              ),
-          ),
+           ),
       ],
     );
   }
-
-
 
   void showRecipeDetails(BuildContext context, Recipe recipe) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (context) => DraggableScrollableSheet(
         expand: false,
         builder: (context, scrollController) => SingleChildScrollView(
@@ -225,7 +263,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     height: 4,
                     width: 40,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -233,9 +273,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 const SizedBox(height: 16),
                 Text(
                   recipe.title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
                 ClipRRect(
@@ -248,49 +288,29 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         height: 250,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image_not_supported),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       );
                     },
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatItem(
-                      context,
-                      '${recipe.possessedCount}',
-                      'Have',
-                      Colors.green,
-                    ),
-                    _buildStatItem(
-                      context,
-                      '${recipe.missingCount}',
-                      'Missing',
-                      Colors.orange,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
                 if (recipe.possessedIngredients.isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.check_circle, color: Colors.green[700], size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Possessed Ingredients (${recipe.possessedIngredients.length})',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                       ),
-                       const SizedBox(height: 12),
-                       ...recipe.possessedIngredients.map(
+                      Text(
+                        'Possessed Ingredients (${recipe.possessedIngredients.length})',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      ...recipe.possessedIngredients.map(
                         (ing) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
@@ -321,20 +341,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.cancel, color: Colors.orange[700], size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Missing Ingredients (${recipe.missingIngredients.length})',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                       ),
-                       const SizedBox(height: 12),
-                       ...recipe.missingIngredients.map(
+                      Text(
+                        'Missing Ingredients (${recipe.missingIngredients.length})',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      ...recipe.missingIngredients.map(
                         (ing) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
@@ -343,7 +356,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: Colors.orange[700],
+                                  color: Theme.of(context).colorScheme.primary,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -366,33 +379,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildStatItem(BuildContext context, String value, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
-      ],
     );
   }
 }
