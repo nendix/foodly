@@ -13,11 +13,11 @@ A minimal, Material 3-compliant Flutter app for managing food inventory and disc
 
 ### 1. Open Food Facts
 - **Endpoint**: `https://world.openfoodfacts.org/api/v0`
-- **Features**: Barcode lookup, product search
+- **Features**: Barcode lookup
 - **Auth**: No authentication required
 
 ### 2. Spoonacular
 - **Endpoint**: `https://api.spoonacular.com/recipes`
 - **Features**: Recipe suggestions by ingredients
-- **Auth**: API key required (set in `lib/utils/constants.dart`)
+- **Auth**: API key required (set in `.env`)
 - **Get Key**: https://spoonacular.com/food-api
