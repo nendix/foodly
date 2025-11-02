@@ -1,4 +1,4 @@
-# foodly - food Inventory Manager
+# foodly - Food Inventory Manager
 
 A minimal, Material 3-compliant Flutter app for managing food inventory and discovering recipes based on available ingredients.
 
