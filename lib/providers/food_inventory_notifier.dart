@@ -48,7 +48,26 @@ class FoodInventoryNotifier extends ChangeNotifier {
           .toList();
     }
 
-    return filtered;
+    return _sortByExpiryDate(filtered);
+  }
+
+  List<Food> _sortByExpiryDate(List<Food> foods) {
+    return foods
+      ..sort((a, b) {
+        final aExpiry = a.expiryDate;
+        final bExpiry = b.expiryDate;
+
+        if (aExpiry == null && bExpiry == null) {
+          return a.name.compareTo(b.name);
+        }
+        if (aExpiry == null) return 1;
+        if (bExpiry == null) return -1;
+
+        final comparison = aExpiry.compareTo(bExpiry);
+        if (comparison != 0) return comparison;
+
+        return a.name.compareTo(b.name);
+      });
   }
 
   void addFood(Food food) {
