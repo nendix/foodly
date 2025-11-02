@@ -82,9 +82,8 @@ jobs:
           name: app-release.apk
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: app-release.apk
-          generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          gh release create "$TAG" app-release.apk --generate-notes
