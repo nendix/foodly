@@ -17,6 +17,9 @@ jobs:
         with:
           flutter-version: '3.35.7'
       
+      - name: Create .env file
+        run: echo "SPOONACULAR_API_KEY=${{ secrets.SPOONACULAR_API_KEY }}" > .env
+      
       - name: Get dependencies
         run: flutter pub get
       
@@ -41,6 +44,9 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.35.7'
+      
+      - name: Create .env file
+        run: echo "SPOONACULAR_API_KEY=${{ secrets.SPOONACULAR_API_KEY }}" > .env
       
       - name: Get dependencies
         run: flutter pub get
