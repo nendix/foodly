@@ -17,7 +17,15 @@ A minimal, Material 3-compliant Flutter app for kitchen pantry management and di
 - **Auth**: No authentication required
 
 ### 2. Spoonacular
-- **Endpoint**: `https://api.spoonacular.com/recipes`
+- **Endpoint**: `https://api.spoonacular.com/recipes/findByIngredients`
 - **Features**: Recipe suggestions by ingredients
 - **Auth**: API key required (set in `.env`)
 - **Get Key**: https://spoonacular.com/food-api
+
+## API Limitations
+
+### Spoonacular API Constraints
+- **Free Tier**: With free tier plan you have 50 points per day then no more calls
+- **API Cost**: Calling the endpoint requires 1 point and 0.01 points per recipe returned.
+- **Recipe Search Limit**: between 1 and 100 results per request
+

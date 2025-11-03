@@ -113,57 +113,23 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
                   expanded: false,
                 ),
               )
-             else
-               Expanded(
-                 child: NotificationListener<ScrollNotification>(
-                   onNotification: (ScrollNotification scrollInfo) {
-                     if (!notifier.isLoadingMore &&
-                         notifier.hasMoreRecipes &&
-                         scrollInfo.metrics.pixels >=
-                             scrollInfo.metrics.maxScrollExtent * 0.8) {
-                       notifier.loadMoreRecipes();
-                     }
-                     return false;
-                   },
-                   child: ListView.separated(
-                     padding: EdgeInsets.all(AppSpacing.lg),
-                     itemCount: notifier.filteredRecipes!.length +
-                         (notifier.isLoadingMore ? 1 : 0),
-                     separatorBuilder: (context, index) {
-                       if (index == notifier.filteredRecipes!.length) {
-                         return SizedBox.shrink();
-                       }
-                       return SizedBox(height: AppSpacing.md);
-                     },
-                     itemBuilder: (context, index) {
-                       if (index == notifier.filteredRecipes!.length) {
-                         return Padding(
-                           padding: EdgeInsets.symmetric(
-                             vertical: AppSpacing.lg,
-                           ),
-                           child: Center(
-                             child: SizedBox(
-                               width: 24,
-                               height: 24,
-                               child: CircularProgressIndicator(
-                                 strokeWidth: 2,
-                                 valueColor: AlwaysStoppedAnimation(
-                                   Theme.of(context).colorScheme.primary,
-                                 ),
-                               ),
-                             ),
-                           ),
-                         );
-                       }
-                       final recipe = notifier.filteredRecipes![index];
-                       return RecipeCard(
-                         recipe: recipe,
-                         onTap: () => showRecipeDetails(context, recipe),
-                       );
-                     },
-                   ),
-                 ),
-               ),
+            else
+              Expanded(
+                child: ListView.separated(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  itemCount: notifier.filteredRecipes!.length,
+                  separatorBuilder: (context, index) {
+                    return SizedBox(height: AppSpacing.md);
+                  },
+                  itemBuilder: (context, index) {
+                    final recipe = notifier.filteredRecipes![index];
+                    return RecipeCard(
+                      recipe: recipe,
+                      onTap: () => showRecipeDetails(context, recipe),
+                    );
+                  },
+                ),
+              ),
           ],
         );
       },

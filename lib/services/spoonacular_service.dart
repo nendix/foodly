@@ -13,7 +13,7 @@ class SpoonacularService {
     try {
       final ingredientList = ingredients.join(',');
       final url =
-          '$baseUrl/findByIngredients?ingredients=$ingredientList&number=10&ranking=1&apiKey=$apiKey';
+          '$baseUrl/findByIngredients?ingredients=$ingredientList&number=30&ranking=1&apiKey=$apiKey';
 
       final response = await _apiService.get(url);
 
