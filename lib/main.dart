@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'services/storage_service.dart';
 import 'theme/theme.dart';
-import 'screens/inventory_screen.dart';
+import 'screens/pantry_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.getTheme(),
       themeMode: ThemeMode.dark,
-      home: const InventoryScreen(),
+      home: const PantryScreen(),
     );
   }
 }

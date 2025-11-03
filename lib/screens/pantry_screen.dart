@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/food.dart';
-import '../providers/food_inventory_notifier.dart';
+import '../providers/pantry_notifier.dart';
 import '../services/navigation_service.dart';
 import '../theme/theme.dart';
 import '../widgets/food_card.dart';
 import '../widgets/empty_state_widget.dart';
 import 'recipes_screen.dart';
 
-class InventoryScreen extends StatefulWidget {
-  const InventoryScreen({super.key});
+class PantryScreen extends StatefulWidget {
+  const PantryScreen({super.key});
 
   @override
-  State<InventoryScreen> createState() => _InventoryScreenState();
+  State<PantryScreen> createState() => _PantryScreenState();
 }
 
-class _InventoryScreenState extends State<InventoryScreen> {
-  late FoodInventoryNotifier _notifier;
+class _PantryScreenState extends State<PantryScreen> {
+  late PantryNotifier _notifier;
   final TextEditingController _searchController = TextEditingController();
   final NavigationService _navigationService = NavigationService();
   int _selectedIndex = 0;
@@ -24,7 +24,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   void initState() {
     super.initState();
-    _notifier = FoodInventoryNotifier();
+    _notifier = PantryNotifier();
   }
 
   @override
@@ -37,14 +37,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void _navigateToAddFood() async {
     final result = await _navigationService.navigateToAddFood(context);
     if (result is Food) {
-      _notifier.addFood(result);
+      _notifier.addItem(result);
     }
   }
 
   void _navigateToEditFood(Food food) async {
     final result = await _navigationService.navigateToEditFood(context, food);
     if (result is Food) {
-      _notifier.updateFood(result);
+      _notifier.updateItem(result);
     }
   }
 
@@ -70,7 +70,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           elevation: 0,
           backgroundColor: AppColors.surfaceDark,
         ),
-        body: _selectedIndex == 0 ? _buildInventoryView() : _buildRecipesView(),
+        body: _selectedIndex == 0 ? _buildPantryView() : _buildRecipesView(),
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {
             setState(() {
@@ -81,7 +81,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.inventory_2),
-              label: 'Inventory',
+              label: 'Pantry',
             ),
             NavigationDestination(
               icon: Icon(Icons.restaurant),
@@ -99,10 +99,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  Widget _buildInventoryView() {
-    return Consumer<FoodInventoryNotifier>(
+  Widget _buildPantryView() {
+    return Consumer<PantryNotifier>(
       builder: (context, notifier, _) {
-        final foods = notifier.foods;
+        final items = notifier.items;
 
         return Column(
           children: [
@@ -110,7 +110,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               padding: EdgeInsets.all(AppSpacing.lg),
               child: SearchBar(
                 controller: _searchController,
-                hintText: 'Search foods...',
+                hintText: 'Search items...',
                 leading: const Icon(Icons.search),
                 trailing: [
                   if (_searchController.text.isNotEmpty)
@@ -127,13 +127,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 },
               ),
             ),
-            if (foods.isEmpty)
+            if (items.isEmpty)
               EmptyStateWidget(
                 icon: Icons.inbox_outlined,
                 title: _searchController.text.isNotEmpty
-                    ? 'No foods match your search'
-                    : 'No foods added yet',
-                subtitle: 'Tap the + button to add a food item',
+                    ? 'No items match your search'
+                    : 'No items added yet',
+                subtitle: 'Tap the + button to add an item',
               )
             else
               Expanded(
@@ -142,17 +142,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     horizontal: AppSpacing.lg,
                     vertical: AppSpacing.sm,
                   ),
-                  itemCount: foods.length,
+                  itemCount: items.length,
                   itemBuilder: (context, index) {
-                    final food = foods[index];
+                    final item = items[index];
                     return Padding(
                       padding: EdgeInsets.only(bottom: AppSpacing.sm),
                       child: FoodCard(
-                        key: ValueKey(food.id),
-                        food: food,
-                        onEdit: () => _navigateToEditFood(food),
+                        key: ValueKey(item.id),
+                        food: item,
+                        onEdit: () => _navigateToEditFood(item),
                         onDelete: () {
-                          _notifier.deleteFood(food.id);
+                          _notifier.deleteItem(item.id);
                         },
                       ),
                     );
@@ -166,9 +166,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   Widget _buildRecipesView() {
-    return Consumer<FoodInventoryNotifier>(
+    return Consumer<PantryNotifier>(
       builder: (context, notifier, _) {
-        return RecipesScreen(foods: notifier.foods);
+        return RecipesScreen(foods: notifier.items);
       },
     );
   }

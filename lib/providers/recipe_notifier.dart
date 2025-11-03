@@ -13,8 +13,6 @@ class RecipeNotifier extends ChangeNotifier {
   bool _isLoadingMore = false;
   String? _error;
   
-  int _offset = 0;
-  final int _itemsPerPage = 10;
   bool _hasMoreRecipes = true;
   List<Food>? _currentFoods;
 
@@ -44,14 +42,12 @@ class RecipeNotifier extends ChangeNotifier {
   Future<void> loadRecipes(List<Food> foods) async {
     if (foods.isEmpty) {
       _recipes = [];
-      _offset = 0;
       _hasMoreRecipes = false;
       notifyListeners();
       return;
     }
 
     _currentFoods = foods;
-    _offset = 0;
     _hasMoreRecipes = true;
 
     if (!await hasInternetConnection()) {
@@ -67,17 +63,12 @@ class RecipeNotifier extends ChangeNotifier {
 
     try {
       final ingredients = foods.map((f) => f.name).toList();
-      final recipes = await _recipeService.findByIngredients(
-        ingredients,
-        offset: _offset,
-        number: _itemsPerPage,
-      );
+      final recipes = await _recipeService.findByIngredients(ingredients);
 
       recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
 
       _recipes = recipes;
-      _offset += _itemsPerPage;
-      _hasMoreRecipes = recipes.length == _itemsPerPage;
+      _hasMoreRecipes = recipes.length == 10;
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -103,18 +94,13 @@ class RecipeNotifier extends ChangeNotifier {
 
     try {
       final ingredients = _currentFoods!.map((f) => f.name).toList();
-      final moreRecipes = await _recipeService.findByIngredients(
-        ingredients,
-        offset: _offset,
-        number: _itemsPerPage,
-      );
+      final moreRecipes = await _recipeService.findByIngredients(ingredients);
 
       if (moreRecipes.isEmpty) {
         _hasMoreRecipes = false;
       } else {
         _recipes!.addAll(moreRecipes);
-        _offset += _itemsPerPage;
-        _hasMoreRecipes = moreRecipes.length == _itemsPerPage;
+        _hasMoreRecipes = moreRecipes.length == 10;
       }
       _error = null;
     } catch (e) {

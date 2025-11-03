@@ -2,11 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foodly/models/food.dart';
 
 void main() {
-  group('FoodInventoryNotifier Sorting Logic Tests', () {
+  group('PantryNotifier Sorting Logic Tests', () {
     group('Sort by Expiry Date', () {
-      test('foods with earlier expiry dates appear first', () {
+      test('items with earlier expiry dates appear first', () {
         final today = DateTime.now();
-        final foods = [
+        final items = [
           Food(
             id: '1',
             name: 'Zebra Food',
@@ -21,15 +21,15 @@ void main() {
           ),
         ];
 
-        final sorted = _sortByExpiryDate(foods);
+        final sorted = _sortByExpiryDate(items);
 
         expect(sorted[0].name, equals('Apple'));
         expect(sorted[1].name, equals('Zebra Food'));
       });
 
-      test('foods without expiry date appear last', () {
+      test('items without expiry date appear last', () {
         final today = DateTime.now();
-        final foods = [
+        final items = [
           Food(id: '1', name: 'No Expiry', quantity: 1, expiryDate: null),
           Food(
             id: '2',
@@ -39,35 +39,35 @@ void main() {
           ),
         ];
 
-        final sorted = _sortByExpiryDate(foods);
+        final sorted = _sortByExpiryDate(items);
 
         expect(sorted[0].name, equals('With Expiry'));
         expect(sorted[1].name, equals('No Expiry'));
       });
 
-      test('foods with same expiry date sorted alphabetically', () {
+      test('items with same expiry date sorted alphabetically', () {
         final sameDate = DateTime(2025, 12, 31);
-        final foods = [
+        final items = [
           Food(id: '1', name: 'Zebra', quantity: 1, expiryDate: sameDate),
           Food(id: '2', name: 'Apple', quantity: 1, expiryDate: sameDate),
           Food(id: '3', name: 'Mango', quantity: 1, expiryDate: sameDate),
         ];
 
-        final sorted = _sortByExpiryDate(foods);
+        final sorted = _sortByExpiryDate(items);
 
         expect(sorted[0].name, equals('Apple'));
         expect(sorted[1].name, equals('Mango'));
         expect(sorted[2].name, equals('Zebra'));
       });
 
-      test('foods without expiry sorted alphabetically among themselves', () {
-        final foods = [
+      test('items without expiry sorted alphabetically among themselves', () {
+        final items = [
           Food(id: '1', name: 'Zebra', quantity: 1, expiryDate: null),
           Food(id: '2', name: 'Apple', quantity: 1, expiryDate: null),
           Food(id: '3', name: 'Mango', quantity: 1, expiryDate: null),
         ];
 
-        final sorted = _sortByExpiryDate(foods);
+        final sorted = _sortByExpiryDate(items);
 
         expect(sorted[0].name, equals('Apple'));
         expect(sorted[1].name, equals('Mango'));
@@ -76,7 +76,7 @@ void main() {
 
       test('complex mix: expiry dates, no expiry, and alphabetical order', () {
         final today = DateTime.now();
-        final foods = [
+        final items = [
           Food(id: '1', name: 'Zebra', quantity: 1, expiryDate: null),
           Food(
             id: '2',
@@ -93,7 +93,7 @@ void main() {
           ),
         ];
 
-        final sorted = _sortByExpiryDate(foods);
+        final sorted = _sortByExpiryDate(items);
 
         expect(sorted[0].name, equals('Banana'));
         expect(sorted[1].name, equals('Apple'));
@@ -103,50 +103,50 @@ void main() {
     });
 
     group('Search Filter Logic', () {
-      test('search filters foods by name case-insensitively', () {
-        final foods = [
+      test('search filters items by name case-insensitively', () {
+        final items = [
           Food(id: '1', name: 'Apple', quantity: 5),
           Food(id: '2', name: 'Banana', quantity: 3),
           Food(id: '3', name: 'apple juice', quantity: 2),
         ];
 
-        final filtered = _filterFoods(foods, 'apple');
+        final filtered = _filterItems(items, 'apple');
 
         expect(filtered, hasLength(2));
         expect(filtered[0].name, equals('Apple'));
         expect(filtered[1].name, equals('apple juice'));
       });
 
-      test('empty search query returns all foods', () {
-        final foods = [
+      test('empty search query returns all items', () {
+        final items = [
           Food(id: '1', name: 'Apple', quantity: 5),
           Food(id: '2', name: 'Banana', quantity: 3),
         ];
 
-        final filtered = _filterFoods(foods, '');
+        final filtered = _filterItems(items, '');
 
         expect(filtered, hasLength(2));
       });
 
       test('search returns no results for non-matching query', () {
-        final foods = [
+        final items = [
           Food(id: '1', name: 'Apple', quantity: 5),
           Food(id: '2', name: 'Banana', quantity: 3),
         ];
 
-        final filtered = _filterFoods(foods, 'xyz');
+        final filtered = _filterItems(items, 'xyz');
 
         expect(filtered, isEmpty);
       });
 
       test('search matches partial names', () {
-        final foods = [
+        final items = [
           Food(id: '1', name: 'Apple', quantity: 5),
           Food(id: '2', name: 'Pineapple', quantity: 3),
           Food(id: '3', name: 'Banana', quantity: 2),
         ];
 
-        final filtered = _filterFoods(foods, 'apple');
+        final filtered = _filterItems(items, 'apple');
 
         expect(filtered, hasLength(2));
       });
@@ -154,8 +154,8 @@ void main() {
   });
 }
 
-List<Food> _sortByExpiryDate(List<Food> foods) {
-  return foods
+List<Food> _sortByExpiryDate(List<Food> items) {
+  return items
     ..sort((a, b) {
       final aExpiry = a.expiryDate;
       final bExpiry = b.expiryDate;
@@ -173,14 +173,14 @@ List<Food> _sortByExpiryDate(List<Food> foods) {
     });
 }
 
-List<Food> _filterFoods(List<Food> foods, String query) {
+List<Food> _filterItems(List<Food> items, String query) {
   if (query.isEmpty) {
-    return foods;
+    return items;
   }
 
-  return foods
+  return items
       .where(
-        (food) => food.name.toLowerCase().contains(query.toLowerCase()),
+        (item) => item.name.toLowerCase().contains(query.toLowerCase()),
       )
       .toList();
 }

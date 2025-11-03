@@ -2,31 +2,31 @@ import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../services/storage_service.dart';
 
-class FoodInventoryNotifier extends ChangeNotifier {
+class PantryNotifier extends ChangeNotifier {
   final StorageService _storageService = StorageService();
-  List<Food> _foods = [];
+  List<Food> _items = [];
   String _searchQuery = '';
   String? _error;
 
-  List<Food> get foods {
-    return _getFilteredFoods();
+  List<Food> get items {
+    return _getFilteredItems();
   }
 
   String get searchQuery => _searchQuery;
 
   String? get error => _error;
 
-  FoodInventoryNotifier() {
-    _loadFoods();
+  PantryNotifier() {
+    _loadItems();
   }
 
-  void _loadFoods() {
+  void _loadItems() {
     try {
-      _foods = _storageService.getAllFoods();
+      _items = _storageService.getAllFoods();
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = 'Failed to load foods: $e';
+      _error = 'Failed to load items: $e';
       notifyListeners();
     }
   }
@@ -36,14 +36,14 @@ class FoodInventoryNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Food> _getFilteredFoods() {
-    List<Food> filtered = _foods;
+  List<Food> _getFilteredItems() {
+    List<Food> filtered = _items;
 
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
           .where(
-            (food) =>
-                food.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+            (item) =>
+                item.name.toLowerCase().contains(_searchQuery.toLowerCase()),
           )
           .toList();
     }
@@ -51,8 +51,8 @@ class FoodInventoryNotifier extends ChangeNotifier {
     return _sortByExpiryDate(filtered);
   }
 
-  List<Food> _sortByExpiryDate(List<Food> foods) {
-    return foods
+  List<Food> _sortByExpiryDate(List<Food> items) {
+    return items
       ..sort((a, b) {
         final aExpiry = a.expiryDate;
         final bExpiry = b.expiryDate;
@@ -70,35 +70,35 @@ class FoodInventoryNotifier extends ChangeNotifier {
       });
   }
 
-  void addFood(Food food) {
+  void addItem(Food item) {
     try {
-      _storageService.addFood(food);
+      _storageService.addFood(item);
       _error = null;
-      _loadFoods();
+      _loadItems();
     } catch (e) {
-      _error = 'Failed to add food: $e';
+      _error = 'Failed to add item: $e';
       notifyListeners();
     }
   }
 
-  void updateFood(Food food) {
+  void updateItem(Food item) {
     try {
-      _storageService.updateFood(food);
+      _storageService.updateFood(item);
       _error = null;
-      _loadFoods();
+      _loadItems();
     } catch (e) {
-      _error = 'Failed to update food: $e';
+      _error = 'Failed to update item: $e';
       notifyListeners();
     }
   }
 
-  void deleteFood(String id) {
+  void deleteItem(String id) {
     try {
       _storageService.deleteFood(id);
       _error = null;
-      _loadFoods();
+      _loadItems();
     } catch (e) {
-      _error = 'Failed to delete food: $e';
+      _error = 'Failed to delete item: $e';
       notifyListeners();
     }
   }

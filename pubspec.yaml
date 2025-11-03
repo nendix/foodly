@@ -1,6 +1,6 @@
 name: foodly
-description: "A food inventory manager with recipe suggestions."
-publish_to: 'none'
+description: "A pantry manager with recipe suggestions."
+publish_to: "none"
 version: 0.1.0
 
 environment:
