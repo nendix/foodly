@@ -17,23 +17,4 @@ class OpenFoodFactsService {
       rethrow;
     }
   }
-
-  Future<List<FoodDTO>> searchByName(String query) async {
-    try {
-      final data = await _apiService.get(
-        '$baseUrl/cgi/search.pl?search_terms=$query&json=1&page_size=10',
-      );
-
-      final products =
-          (data['products'] as List?)
-              ?.cast<Map<String, dynamic>>()
-              .map(FoodDTO.fromJson)
-              .toList() ??
-          [];
-
-      return products;
-    } catch (e) {
-      rethrow;
-    }
-  }
 }
