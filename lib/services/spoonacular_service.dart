@@ -7,13 +7,17 @@ class SpoonacularService {
   static String get apiKey => dotenv.env['SPOONACULAR_API_KEY'] ?? '';
   final ApiService _apiService = ApiService();
 
-  Future<List<Recipe>> findByIngredients(List<String> ingredients) async {
+  Future<List<Recipe>> findByIngredients(
+    List<String> ingredients, {
+    int offset = 0,
+    int number = 10,
+  }) async {
     if (ingredients.isEmpty) return [];
 
     try {
       final ingredientList = ingredients.join(',');
       final url =
-          '$baseUrl/findByIngredients?ingredients=$ingredientList&number=10&ranking=2&apiKey=$apiKey';
+          '$baseUrl/findByIngredients?ingredients=$ingredientList&number=$number&offset=$offset&ranking=2&apiKey=$apiKey';
 
       final response = await _apiService.get(url);
 

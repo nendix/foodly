@@ -10,7 +10,13 @@ class RecipeNotifier extends ChangeNotifier {
   List<Recipe>? _recipes;
   String _searchQuery = '';
   bool _isLoading = false;
+  bool _isLoadingMore = false;
   String? _error;
+  
+  int _offset = 0;
+  final int _itemsPerPage = 10;
+  bool _hasMoreRecipes = true;
+  List<Food>? _currentFoods;
 
   List<Recipe>? get recipes => _recipes;
 
@@ -30,15 +36,23 @@ class RecipeNotifier extends ChangeNotifier {
   }
 
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
   String? get error => _error;
   String get searchQuery => _searchQuery;
+  bool get hasMoreRecipes => _hasMoreRecipes;
 
   Future<void> loadRecipes(List<Food> foods) async {
     if (foods.isEmpty) {
       _recipes = [];
+      _offset = 0;
+      _hasMoreRecipes = false;
       notifyListeners();
       return;
     }
+
+    _currentFoods = foods;
+    _offset = 0;
+    _hasMoreRecipes = true;
 
     if (!await hasInternetConnection()) {
       _error =
@@ -53,16 +67,60 @@ class RecipeNotifier extends ChangeNotifier {
 
     try {
       final ingredients = foods.map((f) => f.name).toList();
-      final recipes = await _recipeService.findByIngredients(ingredients);
+      final recipes = await _recipeService.findByIngredients(
+        ingredients,
+        offset: _offset,
+        number: _itemsPerPage,
+      );
 
       recipes.sort((a, b) => b.possessedCount.compareTo(a.possessedCount));
 
       _recipes = recipes;
+      _offset += _itemsPerPage;
+      _hasMoreRecipes = recipes.length == _itemsPerPage;
       _error = null;
     } catch (e) {
       _error = e.toString();
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMoreRecipes() async {
+    if (_isLoadingMore || !_hasMoreRecipes || _currentFoods == null) {
+      return;
+    }
+
+    if (!await hasInternetConnection()) {
+      _error = 'No internet connection.';
+      notifyListeners();
+      return;
+    }
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      final ingredients = _currentFoods!.map((f) => f.name).toList();
+      final moreRecipes = await _recipeService.findByIngredients(
+        ingredients,
+        offset: _offset,
+        number: _itemsPerPage,
+      );
+
+      if (moreRecipes.isEmpty) {
+        _hasMoreRecipes = false;
+      } else {
+        _recipes!.addAll(moreRecipes);
+        _offset += _itemsPerPage;
+        _hasMoreRecipes = moreRecipes.length == _itemsPerPage;
+      }
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoadingMore = false;
       notifyListeners();
     }
   }
