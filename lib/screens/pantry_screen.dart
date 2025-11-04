@@ -7,6 +7,7 @@ import '../theme/theme.dart';
 import '../widgets/food_card.dart';
 import '../widgets/empty_state_widget.dart';
 import 'recipes_screen.dart';
+import 'tutorial_screen.dart';
 
 class PantryScreen extends StatefulWidget {
   const PantryScreen({super.key});
@@ -48,6 +49,13 @@ class _PantryScreenState extends State<PantryScreen> {
     }
   }
 
+  void _showTutorial() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TutorialScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -69,6 +77,12 @@ class _PantryScreenState extends State<PantryScreen> {
           ),
           elevation: 0,
           backgroundColor: AppColors.surfaceDark,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.help_outline),
+              onPressed: _showTutorial,
+            ),
+          ],
         ),
         body: _selectedIndex == 0 ? _buildPantryView() : _buildRecipesView(),
         bottomNavigationBar: NavigationBar(
