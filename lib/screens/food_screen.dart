@@ -57,8 +57,7 @@ class _FoodScreenState extends State<FoodScreen> {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate:
-          _notifier.expiryDate ?? DateTime(now.year, now.month + 1, now.day),
+      initialDate: _notifier.expiryDate ?? now,
       firstDate: now,
       lastDate: DateTime(now.year + 5),
     );
@@ -170,10 +169,7 @@ class _FoodScreenState extends State<FoodScreen> {
                             ? 'Set Expiry Date (Optional)'
                             : 'Expires: ${notifier.expiryDate!.toLocal().toString().split(' ')[0]}',
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: _selectExpiryDate,
-                      ),
+                      onTap: _selectExpiryDate,
                     ),
                   ),
                   SizedBox(height: AppSpacing.xxl),
