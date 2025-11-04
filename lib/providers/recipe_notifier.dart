@@ -58,7 +58,13 @@ class RecipeNotifier extends ChangeNotifier {
       _recipes = recipes;
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      if (e.toString().contains('Network Error')) {
+        _error = e.toString().replaceFirst('Network Error: ', '');
+      } else if (e.toString().contains('Server Error')) {
+        _error = 'Server error. Please try again later.';
+      } else {
+        _error = 'Failed to load recipes. Please try again.';
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

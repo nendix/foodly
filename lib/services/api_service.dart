@@ -37,12 +37,15 @@ class ApiService {
       } else {
         throw ServerException('HTTP Error: ${response.statusCode}');
       }
-    } on http.ClientException catch (e) {
-      throw NetworkException(e.message);
-    } on FormatException catch (e) {
-      throw ParseException('Invalid JSON response: ${e.message}');
+    } on http.ClientException {
+      throw NetworkException('Unable to connect. Please check your internet connection.');
+    } on FormatException {
+      throw ParseException('Invalid response format from server');
     } catch (e) {
-      throw NetworkException('Unexpected error: $e');
+      if (e.toString().contains('TimeoutException')) {
+        throw NetworkException('Request timed out. Please check your internet connection.');
+      }
+      throw NetworkException('Unable to connect. Please try again.');
     }
   }
 }

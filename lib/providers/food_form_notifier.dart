@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../services/open_food_facts_service.dart';
+import '../services/connectivity_service.dart';
 
 class FoodFormNotifier extends ChangeNotifier {
   final OpenFoodFactsService _apiService = OpenFoodFactsService();
@@ -30,6 +31,12 @@ class FoodFormNotifier extends ChangeNotifier {
   }
 
   Future<void> fetchFoodFromBarcode(String barcode) async {
+    if (!await hasInternetConnection()) {
+      error = 'No internet connection. Please check your network and try again.';
+      notifyListeners();
+      return;
+    }
+
     isLoading = true;
     error = null;
     notifyListeners();
@@ -43,7 +50,13 @@ class FoodFormNotifier extends ChangeNotifier {
         error = 'Food not found';
       }
     } catch (e) {
-      error = 'Failed to fetch food info: $e';
+      if (e.toString().contains('Network Error')) {
+        error = e.toString().replaceFirst('Network Error: ', '');
+      } else if (e.toString().contains('Server Error')) {
+        error = 'Server error. Please try again later.';
+      } else {
+        error = 'Failed to fetch food information. Please try again.';
+      }
     } finally {
       isLoading = false;
       notifyListeners();

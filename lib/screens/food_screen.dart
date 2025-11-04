@@ -70,9 +70,6 @@ class _FoodScreenState extends State<FoodScreen> {
   void _saveFoodItem() {
     final food = _notifier.buildFood();
     if (food == null) {
-      if (_notifier.error != null) {
-        showErrorSnackbar(context, _notifier.error!);
-      }
       return;
     }
     Navigator.pop(context, food);
@@ -84,6 +81,12 @@ class _FoodScreenState extends State<FoodScreen> {
       value: _notifier,
       child: Consumer<FoodFormNotifier>(
         builder: (context, notifier, _) {
+          if (notifier.error != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              showErrorSnackbar(context, notifier.error!);
+            });
+          }
+
           if (notifier.isLoading) {
             return const LoadingWidget(message: 'Fetching food information...');
           }

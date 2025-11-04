@@ -6,6 +6,7 @@ import '../theme/theme.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
+import '../widgets/snackbar_helper.dart';
 import '../providers/recipe_notifier.dart';
 
 class RecipesScreen extends StatelessWidget {
@@ -63,6 +64,12 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
 
     return Consumer<RecipeNotifier>(
       builder: (context, notifier, _) {
+        if (notifier.error != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showErrorSnackbar(context, notifier.error!);
+          });
+        }
+
         if (notifier.isLoading) {
           return const LoadingWidget(message: 'Finding recipes...');
         }
