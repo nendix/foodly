@@ -6,6 +6,7 @@ import '../services/navigation_service.dart';
 import '../theme/theme.dart';
 import '../widgets/food_card.dart';
 import '../widgets/empty_state_widget.dart';
+import '../widgets/snackbar_helper.dart';
 import 'recipes_screen.dart';
 import 'tutorial_screen.dart';
 
@@ -84,7 +85,20 @@ class _PantryScreenState extends State<PantryScreen> {
             ),
           ],
         ),
-        body: _selectedIndex == 0 ? _buildPantryView() : _buildRecipesView(),
+        body: Stack(
+          children: [
+            _selectedIndex == 0 ? _buildPantryView() : _buildRecipesView(),
+            if (_selectedIndex == 0)
+              Positioned(
+                right: AppSpacing.lg,
+                bottom: AppSpacing.lg,
+                child: FloatingActionButton(
+                  onPressed: _navigateToAddFood,
+                  child: const Icon(Icons.add),
+                ),
+              ),
+          ],
+        ),
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {
             setState(() {
@@ -103,12 +117,6 @@ class _PantryScreenState extends State<PantryScreen> {
             ),
           ],
         ),
-        floatingActionButton: _selectedIndex == 0
-            ? FloatingActionButton(
-                onPressed: _navigateToAddFood,
-                child: const Icon(Icons.add),
-              )
-            : null,
       ),
     );
   }
@@ -117,6 +125,12 @@ class _PantryScreenState extends State<PantryScreen> {
     return Consumer<PantryNotifier>(
       builder: (context, notifier, _) {
         final items = notifier.items;
+
+        if (notifier.error != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showErrorSnackbar(context, notifier.error!);
+          });
+        }
 
         return Column(
           children: [
@@ -166,7 +180,13 @@ class _PantryScreenState extends State<PantryScreen> {
                         food: item,
                         onEdit: () => _navigateToEditFood(item),
                         onDelete: () {
+                          final itemName = item.name;
                           _notifier.deleteItem(item.id);
+                          showDeleteSnackbar(
+                            context,
+                            itemName,
+                            () => _notifier.restoreLastDeletedItem(),
+                          );
                         },
                       ),
                     );
