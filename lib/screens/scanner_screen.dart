@@ -3,6 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme.dart';
 import '../providers/scanner_notifier.dart';
+import '../widgets/snackbar_helper.dart';
 
 class ScannerScreen extends StatelessWidget {
   const ScannerScreen({super.key});
@@ -23,6 +24,12 @@ class _ScannerScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ScannerNotifier>(
       builder: (context, notifier, _) {
+        if (notifier.error != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showErrorSnackbar(context, notifier.error!);
+          });
+        }
+
         return Stack(
           children: [
             MobileScanner(
