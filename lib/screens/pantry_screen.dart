@@ -77,7 +77,6 @@ class _PantryScreenState extends State<PantryScreen> {
             ],
           ),
           elevation: 0,
-          backgroundColor: AppColors.surfaceDark,
           actions: [
             IconButton(
               icon: const Icon(Icons.help_outline),
