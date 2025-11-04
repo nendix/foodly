@@ -3,11 +3,9 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScannerNotifier extends ChangeNotifier {
   late MobileScannerController controller;
-  bool _isScannerInitialized = false;
   String? _lastScannedBarcode;
   String? _error;
 
-  bool get isScannerInitialized => _isScannerInitialized;
   String? get lastScannedBarcode => _lastScannedBarcode;
   String? get error => _error;
   MobileScannerController get scannerController => controller;
@@ -23,29 +21,23 @@ class ScannerNotifier extends ChangeNotifier {
   }
 
   void handleDetection(BarcodeCapture capture) {
-    if (!_isScannerInitialized) {
-      try {
-        _isScannerInitialized = true;
-        final List<Barcode> barcodes = capture.barcodes;
-        if (barcodes.isNotEmpty) {
-          final String barcode = barcodes.first.rawValue ?? '';
-          if (barcode.isNotEmpty) {
-            _lastScannedBarcode = barcode;
-            _error = null;
-            notifyListeners();
-          }
-        }
-      } catch (e) {
-        _error = 'Failed to process barcode: $e';
-        notifyListeners();
-      }
-    }
-  }
+    if (_lastScannedBarcode != null) return;
 
-  void resetScanner() {
-    _isScannerInitialized = false;
-    _lastScannedBarcode = null;
-    notifyListeners();
+    try {
+      final List<Barcode> barcodes = capture.barcodes;
+      if (barcodes.isNotEmpty) {
+        final String barcode = barcodes.first.rawValue ?? '';
+        if (barcode.isNotEmpty) {
+          _lastScannedBarcode = barcode;
+          controller.stop();
+          _error = null;
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      _error = 'Failed to process barcode: $e';
+      notifyListeners();
+    }
   }
 
   @override

@@ -36,8 +36,7 @@ class _ScannerScreenContent extends StatelessWidget {
               controller: notifier.scannerController,
               onDetect: (capture) {
                 notifier.handleDetection(capture);
-                if (notifier.isScannerInitialized &&
-                    notifier.lastScannedBarcode != null) {
+                if (notifier.lastScannedBarcode != null) {
                   Navigator.pop(context, notifier.lastScannedBarcode);
                 }
               },
