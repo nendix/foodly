@@ -5,7 +5,7 @@ void showErrorSnackbar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: Colors.redAccent,
+      backgroundColor: Theme.of(context).colorScheme.snackbarError,
       duration: const Duration(seconds: 3),
       behavior: SnackBarBehavior.floating,
     ),
@@ -20,7 +20,7 @@ void showDeleteSnackbar(
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text('$itemName deleted'),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.snackbarInfo,
       duration: const Duration(seconds: 4),
       behavior: SnackBarBehavior.floating,
       elevation: 0,

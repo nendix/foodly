@@ -194,9 +194,8 @@ class _FoodScreenState extends State<FoodScreen> {
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+      style: Theme.of(context).textTheme.titleMediumBold?.copyWith(
         color: AppColors.accentOrange,
-        fontWeight: FontWeight.bold,
       ),
     );
   }

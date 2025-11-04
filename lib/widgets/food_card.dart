@@ -72,11 +72,12 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
     return 'expires in $daysLeft days';
   }
 
-  Color get _expiryColor {
-    if (widget.food.expiryDate == null) return Colors.grey;
-    if (widget.food.isExpired) return Colors.red;
-    if (widget.food.daysUntilExpiry! <= 3) return Colors.orange;
-    return Colors.green;
+  Color _expiryColor(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    if (widget.food.expiryDate == null) return colors.expiryNone;
+    if (widget.food.isExpired) return colors.expiryExpired;
+    if (widget.food.daysUntilExpiry! <= 3) return colors.expiryWarning;
+    return colors.expiryFresh;
   }
 
   void _onHorizontalDragStart(DragStartDetails details) {
@@ -170,9 +171,9 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                         child: Container(
                           alignment: Alignment.centerLeft,
                           padding: EdgeInsets.only(left: AppSpacing.lg),
-                          child: const Icon(
+                          child: Icon(
                             Icons.edit,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.iconSecondary,
                             size: 24,
                           ),
                         ),
@@ -186,9 +187,9 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                         child: Container(
                           alignment: Alignment.centerRight,
                           padding: EdgeInsets.only(right: AppSpacing.lg),
-                          child: const Icon(
+                          child: Icon(
                             Icons.delete,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.iconSecondary,
                             size: 24,
                           ),
                         ),
@@ -236,7 +237,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                   Icon(
                                     Icons.scale,
                                     size: AppSpacing.lg,
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.iconSecondary,
                                   ),
                                   SizedBox(width: AppSpacing.xs),
                                   Text(
@@ -254,14 +255,14 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                   Icon(
                                     Icons.calendar_today,
                                     size: 14,
-                                    color: _expiryColor,
+                                    color: _expiryColor(context),
                                   ),
                                   SizedBox(width: AppSpacing.xs),
                                   Text(
                                     _expiryStatus,
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
-                                          color: _expiryColor,
+                                          color: _expiryColor(context),
                                           fontWeight: FontWeight.w500,
                                         ),
                                   ),

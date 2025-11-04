@@ -21,6 +21,29 @@ final class AppColors {
   static const Color accentGreen = Color(0xFF4CAF50);
 }
 
+extension AppColorScheme on ColorScheme {
+  Color get expiryNone => const Color(0xFF9E9E9E);
+  Color get expiryFresh => const Color(0xFF4CAF50);
+  Color get expiryWarning => const Color(0xFFFF9800);
+  Color get expiryExpired => const Color(0xFFF44336);
+  
+  Color get iconSecondary => const Color(0xFF9E9E9E);
+  Color get overlayDark => const Color(0x66000000);
+  Color get overlayLight => const Color(0xFFFFFFFF);
+  Color get successDark => const Color(0xFF388E3C);
+  
+  Color get snackbarError => const Color(0xFFFF5252);
+  Color get snackbarInfo => const Color(0xFFFFFFFF);
+}
+
+extension AppTextTheme on TextTheme {
+  TextStyle? get titleLargeBold => titleLarge?.copyWith(fontWeight: FontWeight.bold);
+  TextStyle? get titleMediumBold => titleMedium?.copyWith(fontWeight: FontWeight.bold);
+  TextStyle? get titleSmallBold => titleSmall?.copyWith(fontWeight: FontWeight.bold);
+  TextStyle? get bodyLargeMedium => bodyLarge?.copyWith(fontWeight: FontWeight.w500);
+  TextStyle? get bodySmallBold => bodySmall?.copyWith(fontWeight: FontWeight.bold);
+}
+
 final class AppTheme {
   static ThemeData getTheme() {
     return ThemeData(

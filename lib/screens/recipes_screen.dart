@@ -165,9 +165,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
                 SizedBox(height: AppSpacing.lg),
                 Text(
                   recipe.title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleLargeBold,
                 ),
                 SizedBox(height: AppSpacing.lg),
                 ClipRRect(
@@ -198,8 +196,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
                     children: [
                       Text(
                         'Possessed Ingredients (${recipe.possessedIngredients.length})',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.titleMediumBold,
                       ),
                       SizedBox(height: AppSpacing.md),
                       ...recipe.possessedIngredients.map(
@@ -211,7 +208,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: Colors.green[700],
+                                  color: Theme.of(context).colorScheme.successDark,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -235,8 +232,7 @@ class _RecipesScreenContentState extends State<_RecipesScreenContent> {
                     children: [
                       Text(
                         'Missing Ingredients (${recipe.missingIngredients.length})',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.titleMediumBold,
                       ),
                       SizedBox(height: AppSpacing.md),
                       ...recipe.missingIngredients.map(

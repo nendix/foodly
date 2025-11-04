@@ -85,17 +85,22 @@ class TutorialScreen extends StatelessWidget {
                 context,
                 'Green',
                 'Not expiring soon',
-                Colors.green,
+                Theme.of(context).colorScheme.expiryFresh,
               ),
               SizedBox(height: AppSpacing.sm),
               _buildExpiryStatus(
                 context,
                 'Orange',
                 'Expiring within 3 days',
-                Colors.orange,
+                Theme.of(context).colorScheme.expiryWarning,
               ),
               SizedBox(height: AppSpacing.sm),
-              _buildExpiryStatus(context, 'Red', 'Already expired', Colors.red),
+              _buildExpiryStatus(
+                context,
+                'Red',
+                'Already expired',
+                Theme.of(context).colorScheme.expiryExpired,
+              ),
               SizedBox(height: AppSpacing.xl),
               SizedBox(
                 width: double.infinity,
@@ -118,9 +123,7 @@ class TutorialScreen extends StatelessWidget {
       children: [
         Text(
           title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleLargeBold,
         ),
         SizedBox(height: AppSpacing.sm),
         Text(description, style: Theme.of(context).textTheme.bodyMedium),
@@ -145,9 +148,7 @@ class TutorialScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleSmallBold,
               ),
               SizedBox(height: AppSpacing.xs),
               Text(description, style: Theme.of(context).textTheme.bodySmall),
@@ -178,9 +179,7 @@ class TutorialScreen extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '$label - ',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodySmallBold,
                 ),
                 TextSpan(
                   text: description,

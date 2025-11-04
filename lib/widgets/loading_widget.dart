@@ -64,7 +64,10 @@ class _LoadingWidgetState extends State<LoadingWidget>
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white, width: 3),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.overlayLight,
+                          width: 3,
+                        ),
                       ),
                     ),
                   ),
@@ -75,10 +78,7 @@ class _LoadingWidgetState extends State<LoadingWidget>
           SizedBox(height: AppSpacing.xxl),
           Text(
             widget.message,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.textGreyLight,
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(context).textTheme.bodyLargeMedium,
           ),
         ],
       ),

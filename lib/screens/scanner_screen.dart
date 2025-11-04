@@ -64,20 +64,12 @@ class _ScannerScreenContent extends StatelessWidget {
                         SizedBox(height: AppSpacing.xl),
                         Text(
                           'Camera Error',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.titleLargeBold,
                         ),
                         SizedBox(height: AppSpacing.sm),
                         Text(
                           error.errorCode.toString(),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.color
-                                    ?.withValues(alpha: 0.7),
-                              ),
+                          style: Theme.of(context).textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: AppSpacing.xxl),
@@ -122,14 +114,13 @@ class _ScannerScreenContent extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.overlayLight),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Text(
                       'Scan Barcode',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      style: Theme.of(context).textTheme.titleMediumBold?.copyWith(
+                        color: Theme.of(context).colorScheme.overlayLight,
                       ),
                     ),
                     ValueListenableBuilder<TorchState>(
@@ -137,7 +128,7 @@ class _ScannerScreenContent extends StatelessWidget {
                       builder: (context, torchState, _) {
                         return IconButton(
                           icon: Icon(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.overlayLight,
                             torchState == TorchState.on
                                 ? Icons.flash_on
                                 : Icons.flash_off,
@@ -162,7 +153,7 @@ class _ScannerScreenContent extends StatelessWidget {
                     child: Text(
                       'Point camera at barcode',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.overlayLight,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

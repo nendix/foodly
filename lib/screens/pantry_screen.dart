@@ -69,9 +69,8 @@ class _PantryScreenState extends State<PantryScreen> {
               SizedBox(width: AppSpacing.xxs),
               Text(
                 'foodly',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.titleLargeBold?.copyWith(
                   color: AppColors.accentOrange,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],

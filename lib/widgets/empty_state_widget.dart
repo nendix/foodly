@@ -46,19 +46,14 @@ class EmptyStateWidget extends StatelessWidget {
           SizedBox(height: AppSpacing.xxl),
           Text(
             title,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.textGreyLight,
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(context).textTheme.bodyLargeMedium,
             textAlign: TextAlign.center,
           ),
           if (subtitle != null) ...[
             SizedBox(height: AppSpacing.sm),
             Text(
               subtitle!,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textGrey),
+              style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
           ],

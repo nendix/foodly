@@ -31,7 +31,7 @@ class RecipeCard extends StatelessWidget {
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        return _buildPlaceholderImage();
+                        return _buildPlaceholderImage(context);
                       },
                     ),
                     Positioned(
@@ -44,7 +44,7 @@ class RecipeCard extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Colors.black.withValues(alpha: 0.4),
+                              Theme.of(context).colorScheme.overlayDark,
                               Colors.transparent,
                             ],
                           ),
@@ -56,7 +56,7 @@ class RecipeCard extends StatelessWidget {
                 ),
               )
             else
-              _buildPlaceholderImage(),
+              _buildPlaceholderImage(context),
             Padding(
               padding: EdgeInsets.all(AppSpacing.md),
               child: Column(
@@ -64,20 +64,14 @@ class RecipeCard extends StatelessWidget {
                 children: [
                   Text(
                     recipe.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: AppSpacing.lg,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).textTheme.titleMediumBold,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: AppSpacing.md),
                   Text(
                     'Ingredients: ${recipe.possessedCount}/${recipe.possessedCount + recipe.missingCount}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 12,
-                      color: AppColors.textGreyLight,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
@@ -88,7 +82,7 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholderImage() {
+  Widget _buildPlaceholderImage(BuildContext context) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(AppSpacing.lg),
@@ -98,9 +92,9 @@ class RecipeCard extends StatelessWidget {
         height: 200,
         width: double.infinity,
         color: AppColors.surfaceContainer,
-        child: const Icon(
+        child: Icon(
           Icons.image_not_supported,
-          color: Colors.grey,
+          color: Theme.of(context).colorScheme.iconSecondary,
           size: 48,
         ),
       ),
