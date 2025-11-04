@@ -12,7 +12,7 @@ class RecipeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.lg),
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -20,8 +20,8 @@ class RecipeCard extends StatelessWidget {
             if (recipe.image.isNotEmpty)
               ClipRRect(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+                  topLeft: Radius.circular(AppSpacing.lg),
+                  topRight: Radius.circular(AppSpacing.lg),
                 ),
                 child: Stack(
                   children: [
@@ -65,7 +65,7 @@ class RecipeCard extends StatelessWidget {
                   Text(
                     recipe.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: 16,
+                      fontSize: AppSpacing.lg,
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 2,
@@ -91,8 +91,8 @@ class RecipeCard extends StatelessWidget {
   Widget _buildPlaceholderImage() {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
+        topLeft: Radius.circular(AppSpacing.lg),
+        topRight: Radius.circular(AppSpacing.lg),
       ),
       child: Container(
         height: 200,

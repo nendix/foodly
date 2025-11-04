@@ -5,7 +5,6 @@ class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
-  final String? searchQuery;
   final VoidCallback? onActionPressed;
   final String? actionLabel;
   final IconData? actionIcon;
@@ -18,7 +17,6 @@ class EmptyStateWidget extends StatelessWidget {
     required this.icon,
     required this.title,
     this.subtitle,
-    this.searchQuery,
     this.onActionPressed,
     this.actionLabel,
     this.actionIcon,

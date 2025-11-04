@@ -27,13 +27,4 @@ class SpoonacularService {
       rethrow;
     }
   }
-
-  Future<dynamic> getRecipeInfo(int recipeId) async {
-    try {
-      final url = '$baseUrl/$recipeId/information?apiKey=$apiKey';
-      return await _apiService.get(url);
-    } catch (e) {
-      rethrow;
-    }
-  }
 }

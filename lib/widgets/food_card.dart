@@ -208,7 +208,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                   child: Card(
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.lg),
                       ),
                       child: SizedBox(
                         width: double.infinity,
@@ -224,7 +224,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                 widget.food.name,
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(
-                                      fontSize: 16,
+                                      fontSize: AppSpacing.lg,
                                       fontWeight: FontWeight.w600,
                                     ),
                                 maxLines: 1,
@@ -235,7 +235,7 @@ class _FoodCardState extends State<FoodCard> with TickerProviderStateMixin {
                                 children: [
                                   Icon(
                                     Icons.scale,
-                                    size: 16,
+                                    size: AppSpacing.lg,
                                     color: Colors.grey,
                                   ),
                                   SizedBox(width: AppSpacing.xs),
