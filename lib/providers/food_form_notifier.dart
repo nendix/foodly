@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../services/open_food_facts_service.dart';
 import '../services/connectivity_service.dart';
+import '../services/translation_service.dart';
 
 class FoodFormNotifier extends ChangeNotifier {
   final OpenFoodFactsService _apiService = OpenFoodFactsService();
+  final TranslationService _translationService = TranslationService();
   final Food? initialFood;
 
   late TextEditingController nameController;
@@ -44,7 +46,8 @@ class FoodFormNotifier extends ChangeNotifier {
     try {
       final food = await _apiService.searchByBarcode(barcode);
       if (food != null) {
-        nameController.text = food.name;
+        final translatedName = await _translationService.translateToEnglish(food.name);
+        nameController.text = translatedName;
         error = null;
       } else {
         error = 'Food not found';
