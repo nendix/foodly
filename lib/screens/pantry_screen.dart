@@ -85,7 +85,13 @@ class _PantryScreenState extends State<PantryScreen> {
         ),
         body: Stack(
           children: [
-            _selectedIndex == 0 ? _buildPantryView() : _buildRecipesView(),
+            IndexedStack(
+              index: _selectedIndex,
+              children: [
+                _buildPantryView(),
+                _buildRecipesView(),
+              ],
+            ),
             if (_selectedIndex == 0)
               Positioned(
                 right: AppSpacing.lg,
